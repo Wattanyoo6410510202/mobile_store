@@ -1,91 +1,164 @@
 <template>
-  <div class="flex h-screen bg-slate-50 font-sans text-slate-900">
-    <!-- Mobile Menu Backdrop -->
-    <div v-if="isMobileMenuOpen" @click="isMobileMenuOpen = false" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 lg:hidden"></div>
-
-    <!-- Sidebar -->
-    <aside 
-      :class="[
-        'fixed inset-y-0 left-0 w-64 bg-[#0f172a] text-slate-300 flex flex-col z-40 transition-transform duration-300 lg:relative lg:translate-x-0',
-        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-      ]"
-    >
-      <div class="p-6 flex items-center space-x-3 border-b border-slate-800">
-        <div class="bg-blue-600 p-1.5 rounded-lg shadow-md">
-          <Smartphone class="w-5 h-5 text-white" />
-        </div>
-        <span class="text-lg font-bold tracking-tight text-white">VIP Phone <span class="text-blue-500 text-sm">v1</span></span>
-      </div>
-
-      <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-2">เมนูหลัก</p>
-        
-        <router-link to="/admin" exact-active-class="active" @click="isMobileMenuOpen = false" class="nav-item group">
-          <LayoutDashboard class="w-4 h-4" />
-          <span class="text-sm">แดชบอร์ด</span>
-        </router-link>
-
-        <router-link to="/admin/products" @click="isMobileMenuOpen = false" class="nav-item group" active-class="active">
-          <Package class="w-4 h-4" />
-          <span class="text-sm">รายการสินค้า</span>
-        </router-link>
-
-        <router-link to="/admin/products/add" @click="isMobileMenuOpen = false" class="nav-item group" active-class="active">
-          <PlusCircle class="w-4 h-4" />
-          <span class="text-sm">เพิ่มสินค้าใหม่</span>
-        </router-link>
-
-        <div class="pt-6">
-          <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-2">อื่นๆ</p>
-          <a href="#" class="nav-item opacity-50 cursor-not-allowed">
-            <BarChart3 class="w-4 h-4" />
-            <span class="text-sm">รายงานการขาย</span>
-          </a>
-          <a href="#" class="nav-item opacity-50 cursor-not-allowed">
-            <Users class="w-4 h-4" />
-            <span class="text-sm">จัดการพนักงาน</span>
-          </a>
-        </div>
-      </nav>
-
-      <div class="p-4 border-t border-slate-800 bg-slate-900/50">
-        <div class="flex items-center space-x-3 mb-4 px-2">
-          <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-blue-500 border border-slate-700 text-sm font-bold">
-            {{ authStore.user?.name?.charAt(0) }}
-          </div>
-          <div class="flex-1 overflow-hidden">
-            <p class="text-xs font-bold text-white truncate">{{ authStore.user?.name }}</p>
-            <p class="text-[10px] text-slate-500 truncate capitalize">{{ authStore.user?.role === 'admin' ? 'ผู้ดูแลระบบ' : 'พนักงาน' }}</p>
-          </div>
-        </div>
-        <button @click="handleLogout" class="flex items-center space-x-3 w-full p-2.5 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all text-xs font-medium">
-          <LogOut class="w-4 h-4" />
-          <span>ออกจากระบบ</span>
-        </button>
-      </div>
-    </aside>
-
+  <div class="flex flex-col h-screen bg-[var(--gh-canvas-subtle)] font-sans text-[var(--gh-fg-default)]">
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col overflow-hidden w-full bg-slate-50">
-      <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-10">
-        <div class="flex items-center space-x-3">
-          <button @click="isMobileMenuOpen = true" class="p-2 text-slate-500 hover:bg-slate-100 rounded-lg lg:hidden">
-            <Menu class="w-5 h-5" />
-          </button>
-          <h2 class="text-sm font-bold text-slate-800 tracking-tight">{{ pageTitle }}</h2>
-        </div>
-        
-        <div class="flex items-center space-x-3 lg:space-x-4">
-          <div class="flex flex-col items-end hidden sm:flex">
-             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">วันที่ปัจจุบัน</span>
-             <span class="text-xs font-bold text-slate-600">{{ currentDate }}</span>
+    <main class="flex-1 flex flex-col overflow-hidden w-full bg-[var(--gh-canvas-subtle)]">
+      <header class="bg-white border-b sticky top-0 z-10" :style="{ borderColor: 'var(--gh-border-default)' }">
+        <!-- Top bar (GitHub-like) -->
+        <div class="h-12 flex items-center justify-between px-2 sm:px-3 lg:px-6">
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white text-xs font-black tracking-tight">
+              VIP
+            </div>
+
+            <div class="relative" ref="userMenuRef">
+              <button
+                class="inline-flex items-center gap-1.5 px-2 py-1.5 rounded-md hover:bg-slate-100 text-sm font-semibold text-slate-800 min-w-0"
+                @click="isUserMenuOpen = !isUserMenuOpen"
+                aria-haspopup="menu"
+                :aria-expanded="isUserMenuOpen ? 'true' : 'false'"
+              >
+                <UserCircle2 class="w-5 h-5 text-slate-700 sm:hidden" />
+                <span class="truncate hidden sm:inline">{{ authStore.user?.name || 'Administrator' }}</span>
+                <ChevronDown class="w-4 h-4 text-slate-500 flex-shrink-0" />
+              </button>
+
+              <div
+                v-if="isUserMenuOpen"
+                class="absolute right-0 mt-2 w-56 rounded-md border bg-white shadow-lg py-1"
+                :style="{ borderColor: 'var(--gh-border-default)' }"
+                role="menu"
+              >
+                <div class="px-3 py-2 border-b" :style="{ borderColor: 'var(--gh-border-default)' }">
+                  <p class="text-xs font-bold text-slate-800 truncate">{{ authStore.user?.name || 'Administrator' }}</p>
+                  <p class="text-[11px] text-slate-500 truncate capitalize">{{ authStore.user?.role === 'admin' ? 'ผู้ดูแลระบบ' : 'พนักงาน' }}</p>
+                </div>
+
+                <button
+                  class="w-full text-left px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 flex items-center gap-2"
+                  @click="handleLogoutFromMenu"
+                  role="menuitem"
+                >
+                  <LogOut class="w-4 h-4 text-slate-500" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
           </div>
-          <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
-          <Bell class="w-5 h-5 text-slate-400 hover:text-blue-600 cursor-pointer transition" />
+
+          <div class="flex items-center gap-2">
+            <!-- Search -->
+            <div class="hidden md:flex items-center">
+              <div class="relative">
+                <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <input
+                  class="h-8 w-[260px] lg:w-[360px] rounded-md border bg-white pl-9 pr-20 text-sm text-slate-800 placeholder:text-slate-500 focus:outline-none"
+                  :style="{ borderColor: 'var(--gh-border-default)' }"
+                  placeholder="Type / to search"
+                />
+                <kbd class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-slate-500 border rounded px-1.5 py-0.5 bg-white"
+                  :style="{ borderColor: 'var(--gh-border-default)' }"
+                >/</kbd>
+              </div>
+            </div>
+
+            <!-- Icon buttons -->
+            <button class="md:hidden inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
+              :style="{ borderColor: 'var(--gh-border-default)' }"
+              aria-label="Search"
+              title="Search"
+            >
+              <Search class="w-4 h-4" />
+            </button>
+
+            <button class="inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
+              :style="{ borderColor: 'var(--gh-border-default)' }"
+              aria-label="Apps"
+            >
+              <LayoutGrid class="w-4 h-4" />
+            </button>
+
+            <button class="inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
+              :style="{ borderColor: 'var(--gh-border-default)' }"
+              aria-label="New"
+            >
+              <Plus class="w-4 h-4" />
+            </button>
+
+            <button class="hidden sm:inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
+              :style="{ borderColor: 'var(--gh-border-default)' }"
+              aria-label="Issues"
+            >
+              <CircleDot class="w-4 h-4" />
+            </button>
+
+            <button class="hidden sm:inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
+              :style="{ borderColor: 'var(--gh-border-default)' }"
+              aria-label="Pull requests"
+            >
+              <GitPullRequest class="w-4 h-4" />
+            </button>
+
+            <button class="inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
+              :style="{ borderColor: 'var(--gh-border-default)' }"
+              aria-label="Notifications"
+            >
+              <Inbox class="w-4 h-4" />
+            </button>
+
+            <button class="hidden sm:inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
+              :style="{ borderColor: 'var(--gh-border-default)' }"
+              aria-label="Profile"
+            >
+              <UserCircle2 class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Second row tabs (like screenshot) -->
+        <div class="h-10 flex items-center gap-4 px-2 sm:px-3 lg:px-6 border-t overflow-x-auto gh-scrollbar-hide" :style="{ borderColor: 'var(--gh-border-default)' }">
+          <router-link
+            to="/admin"
+            class="inline-flex items-center gap-2 text-sm font-semibold px-2 py-1 rounded-md hover:bg-slate-100 whitespace-nowrap flex-shrink-0"
+            :class="route.name === 'Dashboard' ? 'text-slate-900' : 'text-slate-600'"
+          >
+            <LayoutDashboard class="w-4 h-4" />
+            <span>Dashboard</span>
+          </router-link>
+
+          <router-link
+            to="/admin/products"
+            class="inline-flex items-center gap-2 text-sm font-semibold px-2 py-1 rounded-md hover:bg-slate-100 whitespace-nowrap flex-shrink-0"
+            :class="route.name === 'ProductList' ? 'text-slate-900' : 'text-slate-600'"
+          >
+            <Package class="w-4 h-4" />
+            <span>สินค้า</span>
+          </router-link>
+
+          <router-link
+            to="/admin/products/add"
+            class="inline-flex items-center gap-2 text-sm font-semibold px-2 py-1 rounded-md hover:bg-slate-100 whitespace-nowrap flex-shrink-0"
+            :class="route.name === 'AddProduct' ? 'text-slate-900' : 'text-slate-600'"
+          >
+            <PlusCircle class="w-4 h-4" />
+            <span>เพิ่มสินค้า</span>
+          </router-link>
+
+          <router-link
+            to="/admin/products/scan"
+            class="inline-flex items-center gap-2 text-sm font-semibold px-2 py-1 rounded-md hover:bg-slate-100 whitespace-nowrap flex-shrink-0"
+            :class="route.name === 'Scanner' ? 'text-slate-900' : 'text-slate-600'"
+          >
+            <QrCode class="w-4 h-4" />
+            <span>สแกน</span>
+          </router-link>
+
+          <div class="ml-auto text-xs font-semibold text-slate-500 hidden md:block">
+            {{ pageTitle }} • {{ currentDate }}
+          </div>
         </div>
       </header>
 
-      <section class="flex-1 overflow-y-auto p-4 lg:p-8 bg-slate-50">
+      <section class="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-8 bg-[var(--gh-canvas-subtle)]">
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />
@@ -96,18 +169,31 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue';
+<script setup lang="ts">
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useAuthStore } from '../store/auth';
 import { useRouter, useRoute } from 'vue-router';
 import { 
-  LayoutDashboard, Package, PlusCircle, LogOut, Smartphone, BarChart3, Users, Bell, Menu
+  LayoutDashboard,
+  Package,
+  PlusCircle,
+  LogOut,
+  Search,
+  LayoutGrid,
+  Plus,
+  CircleDot,
+  GitPullRequest,
+  Inbox,
+  UserCircle2,
+  ChevronDown,
+  QrCode,
 } from 'lucide-vue-next';
 
 const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
-const isMobileMenuOpen = ref(false);
+const isUserMenuOpen = ref(false);
+const userMenuRef = ref<HTMLElement | null>(null);
 
 const pageTitle = computed(() => {
   switch (route.name) {
@@ -126,17 +212,32 @@ const handleLogout = () => {
   authStore.logout();
   router.push('/login');
 };
+
+const handleLogoutFromMenu = () => {
+  isUserMenuOpen.value = false;
+  handleLogout();
+};
+
+const onDocumentPointerDown = (e: PointerEvent) => {
+  if (!isUserMenuOpen.value) return;
+  const el = userMenuRef.value;
+  if (!el) return;
+  if (e.target instanceof Node && !el.contains(e.target)) {
+    isUserMenuOpen.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('pointerdown', onDocumentPointerDown);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', onDocumentPointerDown);
+});
 </script>
 
 <style scoped>
 @reference "../style.css";
-
-.nav-item {
-  @apply flex items-center space-x-3 p-3 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all font-medium text-sm;
-}
-.nav-item.active {
-  @apply bg-blue-600 text-white shadow-md;
-}
 
 .fade-enter-active, .fade-leave-active { transition: opacity 0.15s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }

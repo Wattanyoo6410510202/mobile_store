@@ -7,12 +7,12 @@
 
     <!-- Header -->
     <div class="flex items-center space-x-3 mb-6">
-      <button @click="$router.back()" class="p-2 bg-white rounded-xl border border-slate-200 text-slate-400 hover:text-blue-600 transition">
+      <button @click="$router.back()" class="gh-btn !p-2" aria-label="Back">
         <ArrowLeft class="w-5 h-5" />
       </button>
       <div>
-        <h1 class="text-xl font-bold text-slate-800">{{ isEdit ? 'แก้ไขข้อมูลสินค้า' : 'ลงทะเบียนเครื่องใหม่' }}</h1>
-        <p class="text-xs text-slate-500">ขั้นตอนที่ {{ currentStep }} จาก 4: {{ stepTitles[currentStep-1] }}</p>
+        <h1 class="gh-h1">{{ isEdit ? 'แก้ไขข้อมูลสินค้า' : 'ลงทะเบียนเครื่องใหม่' }}</h1>
+        <p class="gh-subtitle">ขั้นตอนที่ {{ currentStep }} จาก 4: {{ stepTitles[currentStep-1] }}</p>
       </div>
     </div>
 
@@ -84,14 +84,14 @@
           </div>
           <div v-if="form.hasWarranty" class="form-group">
             <label>ประเภทการประกัน</label>
-            <select v-model="form.warrantyType" class="bg-slate-50 border rounded-xl p-3">
+            <select v-model="form.warrantyType" class="gh-input">
               <option value="shop">ประกันร้าน</option>
               <option value="manufacturer">ประกันศูนย์</option>
             </select>
           </div>
           <div v-if="form.hasWarranty" class="form-group">
             <label>วันสิ้นสุดประกัน</label>
-            <input v-model="form.warrantyEndDate" type="date" class="p-3 border rounded-xl">
+            <input v-model="form.warrantyEndDate" type="date" class="gh-input">
           </div>
           <div class="form-group">
             <label>รูปปก (Thumbnail)</label>
@@ -101,7 +101,7 @@
                 <X class="w-4 h-4" />
               </button>
             </div>
-            <input type="file" @change="e => form.thumbnail = e.target.files[0]" class="p-2 border rounded-xl">
+            <input type="file" @change="e => form.thumbnail = e.target.files[0]" class="gh-input !p-2">
           </div>
         </div>
       </div>
@@ -289,12 +289,12 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex items-center justify-between pt-6 border-t mt-8">
+      <div class="flex items-center justify-between pt-6 border-t mt-8" :style="{ borderColor: 'var(--gh-border-default)' }">
         <button 
           type="button" 
           @click="currentStep--" 
           v-if="currentStep > 1"
-          class="p-3 text-slate-500 hover:bg-slate-100 rounded-full transition"
+          class="gh-btn !p-2"
         >
           <ArrowLeft class="w-6 h-6" />
         </button>
@@ -304,7 +304,7 @@
           v-if="currentStep < 4"
           type="button" 
           @click="currentStep++"
-          class="p-3 bg-slate-800 text-white rounded-full shadow-md hover:bg-900 transition active:scale-95"
+          class="gh-btn gh-btn-primary !p-2 rounded-full active:translate-y-px"
         >
           <ArrowRight class="w-6 h-6" />
         </button>
@@ -312,7 +312,7 @@
         <button 
           v-else
           type="submit" 
-          class="px-10 py-3 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-200 hover:bg-blue-700 transition active:scale-95 disabled:opacity-50"
+          class="gh-btn gh-btn-primary px-6 py-2.5 active:translate-y-px disabled:opacity-50"
           :disabled="loading"
         >
           {{ loading ? 'กำลังบันทึก...' : (isEdit ? 'บันทึก' : 'ยืนยัน') }}
@@ -527,9 +527,9 @@ onMounted(fetchProduct);
 <style>
 .form-section {
   background: white;
-  padding: 2rem;
-  border-radius: 1rem;
-  border: 1px solid #e2e8f0;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--gh-border-default);
   margin-bottom: 1.5rem;
 }
 .section-header {
@@ -550,10 +550,11 @@ onMounted(fetchProduct);
   text-transform: uppercase;
 }
 .form-group input, .form-input {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
-  padding: 0.75rem;
+  background: var(--gh-canvas-default);
+  border: 1px solid var(--gh-border-default);
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
   width: 100%;
+  font-size: 0.875rem;
 }
 </style>

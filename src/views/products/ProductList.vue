@@ -1,22 +1,22 @@
 <template>
   <div class="space-y-4">
     <!-- Header with Search and Actions -->
-    <div class="card bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <div class="gh-surface gh-card p-6">
       <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
         <h2 class="text-xl font-black text-slate-800 tracking-tight">รายการสินค้า VIP Phone</h2>
         <div class="flex items-center space-x-3 w-full sm:w-auto">
           <input 
             v-model="searchQuery" 
             placeholder="ค้นหา..." 
-            class="px-4 py-2 border rounded-xl w-full sm:w-64"
+            class="gh-input w-full sm:w-64"
           />
-          <button @click="exportToExcel" class="p-3 bg-emerald-100 text-emerald-600 rounded-xl hover:bg-emerald-200 transition" title="Export Excel">
-            <Download class="w-6 h-6" />
+          <button @click="exportToExcel" class="gh-btn" title="Export Excel">
+            <Download class="w-4 h-4" />
           </button>
-          <router-link to="/admin/products/scan" class="p-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition">
-            <QrCode class="w-6 h-6" />
+          <router-link to="/admin/products/scan" class="gh-btn" title="สแกน QR">
+            <QrCode class="w-4 h-4" />
           </router-link>
-          <router-link to="/admin/products/add" class="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-bold shadow-lg shadow-blue-200">
+          <router-link to="/admin/products/add" class="gh-btn gh-btn-primary px-4">
             <Plus class="w-5 h-5" />
             <span>เพิ่มสินค้าใหม่</span>
           </router-link>
@@ -25,8 +25,8 @@
 
       <!-- Custom Table -->
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-600">
-          <thead class="bg-slate-50 text-slate-700 uppercase text-xs font-bold">
+        <table class="w-full text-left text-sm text-slate-700">
+          <thead class="text-slate-600 uppercase text-xs font-bold" :style="{ background: 'var(--gh-canvas-subtle)', borderBottom: '1px solid var(--gh-border-default)' }">
             <tr>
               <th class="px-6 py-4">รูปปก</th>
               <th class="px-6 py-4">ยี่ห้อ</th>
@@ -38,8 +38,8 @@
               <th class="px-6 py-4">จัดการ</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100">
-            <tr v-for="product in filteredProducts" :key="product.id" class="hover:bg-slate-50 transition">
+          <tbody class="divide-y" :style="{ borderColor: 'var(--gh-border-muted)' }">
+            <tr v-for="product in filteredProducts" :key="product.id" class="hover:bg-[var(--gh-canvas-subtle)] transition">
               <td class="px-6 py-4">
                 <img v-if="product.thumbnail" :src="`http://localhost:5000${product.thumbnail}`" class="w-12 h-12 object-cover rounded-lg border" />
                 <div v-else class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">

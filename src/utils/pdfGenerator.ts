@@ -1,7 +1,20 @@
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 
-export const generateWarrantyReceipt = (product, seller, store) => {
+type StoreSettings = {
+  storeName?: string;
+  storePhone?: string;
+  warrantyDays?: number;
+};
+
+type Product = {
+  brand?: string;
+  model?: string;
+  imei1?: string;
+  conditionNote?: string;
+};
+
+export const generateWarrantyReceipt = (product: Product, _seller: unknown, store: StoreSettings) => {
   const doc = new jsPDF();
 
   doc.setFontSize(20);
@@ -14,8 +27,8 @@ export const generateWarrantyReceipt = (product, seller, store) => {
   doc.text('ใบรับประกันสินค้า', 105, 45, { align: 'center' });
   
   doc.setFontSize(12);
-  doc.text(`สินค้า: ${product.brand} ${product.model}`, 20, 60);
-  doc.text(`IMEI: ${product.imei1}`, 20, 70);
+  doc.text(`สินค้า: ${product.brand || '-'} ${product.model || ''}`.trim(), 20, 60);
+  doc.text(`IMEI: ${product.imei1 || '-'}`, 20, 70);
   doc.text(`วันที่ขาย: ${new Date().toLocaleDateString('th-TH')}`, 20, 80);
 
   doc.setFontSize(10);
@@ -32,5 +45,5 @@ export const generateWarrantyReceipt = (product, seller, store) => {
   doc.line(120, 180, 190, 180);
   doc.text('ลงชื่อลูกค้า', 155, 185, { align: 'center' });
 
-  doc.save(`warranty_${product.model}.pdf`);
+  doc.save(`warranty_${product.model || 'product'}.pdf`);
 };

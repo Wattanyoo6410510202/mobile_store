@@ -1,15 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* GitHub-like tokens (Primer-ish) */
+  --gh-fg-default: #1f2328;
+  --gh-fg-muted: #636c76;
+  --gh-fg-subtle: #6e7781;
+  --gh-canvas-default: #ffffff;
+  --gh-canvas-subtle: #f6f8fa;
+  --gh-border-default: #d0d7de;
+  --gh-border-muted: #d8dee4;
+  --gh-neutral-muted: rgba(175, 184, 193, 0.2);
+  --gh-accent-fg: #0969da;
+  --gh-accent-emphasis: #0969da;
+  --gh-success-fg: #1a7f37;
+  --gh-danger-fg: #d1242f;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter,
+    Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  color: var(--gh-fg-default);
+  background-color: var(--gh-canvas-subtle);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -19,4 +28,88 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: var(--gh-canvas-subtle);
+  color: var(--gh-fg-default);
+}
+
+@layer base {
+  :focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--gh-accent-emphasis) 55%, transparent);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Reusable GitHub-ish primitives to mix with Tailwind utilities */
+  .gh-surface {
+    @apply bg-white border border-slate-200 shadow-sm;
+    border-color: var(--gh-border-default);
+  }
+
+  .gh-card {
+    @apply rounded-xl;
+  }
+
+  .gh-page {
+    @apply max-w-6xl mx-auto;
+  }
+
+  .gh-h1 {
+    @apply text-xl font-extrabold tracking-tight text-slate-900;
+  }
+
+  .gh-h2 {
+    @apply text-sm font-extrabold tracking-tight text-slate-900;
+  }
+
+  .gh-subtitle {
+    @apply text-xs font-semibold text-slate-500;
+  }
+
+  .gh-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition-colors;
+    border: 1px solid var(--gh-border-default);
+    background: var(--gh-canvas-default);
+    color: var(--gh-fg-default);
+  }
+  .gh-btn:hover {
+    background: var(--gh-canvas-subtle);
+  }
+  .gh-btn-primary {
+    background: var(--gh-accent-emphasis);
+    border-color: color-mix(in srgb, var(--gh-accent-emphasis) 90%, black);
+    color: #fff;
+  }
+  .gh-btn-primary:hover {
+    background: color-mix(in srgb, var(--gh-accent-emphasis) 92%, black);
+  }
+
+  .gh-input {
+    @apply w-full rounded-md px-3 py-2 text-sm transition-shadow;
+    background: var(--gh-canvas-default);
+    color: var(--gh-fg-default);
+    border: 1px solid var(--gh-border-default);
+  }
+  .gh-input:focus {
+    outline: none;
+    border-color: color-mix(in srgb, var(--gh-accent-emphasis) 65%, var(--gh-border-default));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--gh-accent-emphasis) 20%, transparent);
+  }
+
+  .gh-muted {
+    color: var(--gh-fg-muted);
+  }
+
+  .gh-link {
+    color: var(--gh-accent-fg);
+    @apply font-semibold hover:underline;
+  }
+
+  .gh-scrollbar-hide {
+    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .gh-scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
 }
