@@ -55,18 +55,8 @@
         <router-link to="/products" class="text-blue-600 text-xs font-bold hover:underline">ดูทั้งหมด</router-link>
       </div>
       <div class="p-2">
-        <div v-for="i in 3" :key="i" class="flex items-center p-3 rounded-xl hover:bg-slate-50 transition">
-          <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center mr-4 flex-shrink-0">
-            <Smartphone class="w-5 h-5 text-slate-400" />
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-bold text-slate-800 truncate">iPhone 15 Pro Max</p>
-            <p class="text-[10px] text-slate-500">โดย พนักงาน • 2 นาทีที่แล้ว</p>
-          </div>
-          <div class="text-right ml-4">
-            <p class="text-sm font-bold text-emerald-600">฿42,900</p>
-            <p class="text-[10px] text-slate-400">สต็อกเข้า</p>
-          </div>
+        <div class="p-8 text-center text-slate-400 text-xs">
+          ไม่พบรายการอัปเดตล่าสุด
         </div>
       </div>
     </div>

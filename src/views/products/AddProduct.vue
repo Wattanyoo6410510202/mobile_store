@@ -270,15 +270,7 @@
 
           <div class="border-t pt-4">
              <p class="text-[10px] text-slate-400 font-bold uppercase mb-2">ข้อมูลการทดสอบซอฟต์แวร์</p>
-             <div class="flex items-center space-x-3">
-                <button type="button" @click="mockTest" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-bold border border-slate-200 hover:bg-slate-200 transition">
-                   ดึงข้อมูลจากระบบทดสอบภายนอก
-                </button>
-                <span v-if="form.testData" class="text-emerald-600 text-[10px] font-bold flex items-center">
-                   <CheckCircle2 class="w-3 h-3 mr-1" /> เชื่อมต่อสำเร็จ
-                </span>
-             </div>
-             <textarea v-if="form.testData" readonly class="mt-2 w-full bg-slate-50 border-none rounded-xl p-3 text-[10px] font-mono text-slate-500 h-20" :value="JSON.stringify(form.testData, null, 2)"></textarea>
+             <p class="text-[10px] text-slate-500">ข้อมูลการทดสอบจะถูกบันทึกโดยอัตโนมัติเมื่อมีการตรวจสอบผ่านระบบ</p>
           </div>
         </div>
 
@@ -304,7 +296,7 @@
           v-if="currentStep < 4"
           type="button" 
           @click="currentStep++"
-          class="gh-btn gh-btn-primary !p-2 rounded-full active:translate-y-px"
+          class="gh-btn !p-2"
         >
           <ArrowRight class="w-6 h-6" />
         </button>
@@ -312,7 +304,7 @@
         <button 
           v-else
           type="submit" 
-          class="gh-btn gh-btn-primary px-6 py-2.5 active:translate-y-px disabled:opacity-50"
+          class="gh-btn px-6 py-2 bg-emerald-600 text-white hover:bg-emerald-700 active:translate-y-px disabled:opacity-50"
           :disabled="loading"
         >
           {{ loading ? 'กำลังบันทึก...' : (isEdit ? 'บันทึก' : 'ยืนยัน') }}

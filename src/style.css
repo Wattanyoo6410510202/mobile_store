@@ -92,8 +92,8 @@ body {
   }
   .gh-input:focus {
     outline: none;
-    border-color: color-mix(in srgb, var(--gh-accent-emphasis) 65%, var(--gh-border-default));
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--gh-accent-emphasis) 20%, transparent);
+    border-color: #94a3b8; /* Slate-400 */
+    box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.2); /* Slate-400 with opacity */
   }
 
   .gh-muted {

@@ -4,8 +4,8 @@ const productController = require('../controllers/productController');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
-router.get('/', auth, productController.getProducts);
-router.get('/:id', auth, productController.getProduct);
+router.get('/', productController.getProducts);
+router.get('/:id', productController.getProduct);
 router.post('/', auth, upload.fields([
   { name: 'images', maxCount: 20 },
   { name: 'idCardImage', maxCount: 1 },

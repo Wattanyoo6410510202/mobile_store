@@ -54,6 +54,52 @@
       </div>
     </section>
 
+    <!-- Product Showcase -->
+    <section id="products" class="py-20 max-w-6xl mx-auto px-6">
+      <div class="flex items-center justify-between mb-10">
+        <h2 class="text-3xl font-black text-slate-900 tracking-tight">สินค้าแนะนำ</h2>
+        <a href="#contact" class="text-sm font-bold text-blue-600 hover:underline">ดูสินค้าทั้งหมด</a>
+      </div>
+      
+      <div class="flex gap-8">
+        <!-- Sidebar Filter -->
+        <aside class="w-64 flex-shrink-0 hidden md:block">
+          <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm sticky top-24">
+             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">ยี่ห้อ (Brand)</h3>
+             <ul class="space-y-2">
+                <li>
+                  <button @click="selectedBrand = null" :class="selectedBrand === null ? 'text-blue-600 font-bold' : 'text-slate-600'" class="text-sm hover:text-blue-600 transition">ทั้งหมด</button>
+                </li>
+                <li v-for="brand in uniqueBrands" :key="brand">
+                  <button @click="selectedBrand = brand" :class="selectedBrand === brand ? 'text-blue-600 font-bold' : 'text-slate-600'" class="text-sm hover:text-blue-600 transition">{{ brand }}</button>
+                </li>
+             </ul>
+          </div>
+        </aside>
+
+        <!-- Product Grid -->
+        <div class="flex-1">
+          <div v-if="loading" class="text-center text-slate-500 py-20">กำลังโหลดสินค้า...</div>
+          <div v-else-if="filteredProducts.length === 0" class="text-center text-slate-500 py-20">ไม่พบสินค้าพร้อมขายในขณะนี้</div>
+          <div v-else class="grid grid-cols-2 lg:grid-cols-3 gap-6">
+            <div v-for="product in filteredProducts" :key="product.id" class="bg-white rounded-2xl p-3 border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300">
+              <div class="relative overflow-hidden rounded-xl mb-3 bg-slate-100 aspect-square">
+                 <img v-if="product.thumbnail" :src="`http://localhost:5000${product.thumbnail}`" class="w-full h-full object-cover" />
+                 <div v-else class="w-full h-full flex items-center justify-center text-slate-400">
+                    <Smartphone class="w-8 h-8" />
+                 </div>
+              </div>
+              <div class="px-1">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">{{ product.brand }}</p>
+                <p class="text-sm font-bold text-slate-900 truncate mb-2">{{ product.model }}</p>
+                <p class="text-sm font-black text-slate-900 tracking-tight">฿{{ Number(product.sellPrice).toLocaleString() }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Warranty Footer -->
     <section id="warranty" class="py-20 bg-slate-900 text-white text-center">
       <div class="max-w-2xl mx-auto px-6">
@@ -70,5 +116,34 @@
 </template>
 
 <script setup>
-import { CheckCircle, ShieldCheck, Headphones } from 'lucide-vue-next';
+import { ref, computed, onMounted } from 'vue';
+import axios from 'axios';
+import { CheckCircle, ShieldCheck, Headphones, Smartphone } from 'lucide-vue-next';
+
+const availableProducts = ref([]);
+const loading = ref(true);
+const selectedBrand = ref(null);
+
+const fetchAvailableProducts = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/products');
+    availableProducts.value = response.data.filter(p => p.status === 'available');
+  } catch (error) {
+    console.error('Error fetching products:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const uniqueBrands = computed(() => {
+  const brands = availableProducts.value.map(p => p.brand).filter(Boolean);
+  return [...new Set(brands)].sort();
+});
+
+const filteredProducts = computed(() => {
+  if (!selectedBrand.value) return availableProducts.value;
+  return availableProducts.value.filter(p => p.brand === selectedBrand.value);
+});
+
+onMounted(fetchAvailableProducts);
 </script>

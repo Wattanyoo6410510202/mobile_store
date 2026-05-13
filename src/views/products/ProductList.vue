@@ -1,15 +1,18 @@
 <template>
   <div class="space-y-4">
     <!-- Header with Search and Actions -->
-    <div class="gh-surface gh-card p-6">
-      <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
-        <h2 class="text-xl font-black text-slate-800 tracking-tight">รายการสินค้า VIP Phone</h2>
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
+    <div class="gh-surface gh-card p-4 mb-6">
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="flex items-center space-x-3 w-full">
           <input 
             v-model="searchQuery" 
             placeholder="ค้นหา..." 
-            class="gh-input w-full sm:w-64"
+            class="gh-input w-full"
           />
+          <button @click="viewMode = viewMode === 'table' ? 'card' : 'table'" class="gh-btn" title="สลับมุมมอง">
+            <LayoutGrid v-if="viewMode === 'table'" class="w-4 h-4" />
+            <Table v-else class="w-4 h-4" />
+          </button>
           <button @click="exportToExcel" class="gh-btn" title="Export Excel">
             <Download class="w-4 h-4" />
           </button>
@@ -18,28 +21,26 @@
           </router-link>
           <router-link to="/admin/products/add" class="gh-btn gh-btn-primary px-4">
             <Plus class="w-5 h-5" />
-            <span>เพิ่มสินค้าใหม่</span>
+            <span>เพิ่ม</span>
           </router-link>
         </div>
       </div>
 
-      <!-- Custom Table -->
-      <div class="overflow-x-auto">
+      <!-- Table View -->
+      <div v-if="viewMode === 'table'" class="mt-6 overflow-x-auto border rounded-lg" :style="{ borderColor: 'var(--gh-border-default)' }">
         <table class="w-full text-left text-sm text-slate-700">
           <thead class="text-slate-600 uppercase text-xs font-bold" :style="{ background: 'var(--gh-canvas-subtle)', borderBottom: '1px solid var(--gh-border-default)' }">
             <tr>
-              <th class="px-6 py-4">รูปปก</th>
-              <th class="px-6 py-4">ยี่ห้อ</th>
-              <th class="px-6 py-4">รุ่น</th>
-              <th class="px-6 py-4">IMEI</th>
-              <th class="px-6 py-4">วันที่เพิ่ม</th>
-              <th class="px-6 py-4">ราคา</th>
-              <th class="px-6 py-4">สถานะ</th>
-              <th class="px-6 py-4">จัดการ</th>
+              <th v-for="col in columns" :key="col.key" class="px-6 py-4 cursor-pointer hover:text-slate-900" @click="sortBy(col.key)">
+                <div class="flex items-center gap-1">
+                  {{ col.label }}
+                  <ChevronDown class="w-3 h-3" v-if="sortKey === col.key" />
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y" :style="{ borderColor: 'var(--gh-border-muted)' }">
-            <tr v-for="product in filteredProducts" :key="product.id" class="hover:bg-[var(--gh-canvas-subtle)] transition">
+            <tr v-for="product in sortedProducts" :key="product.id" class="hover:bg-[var(--gh-canvas-subtle)] transition">
               <td class="px-6 py-4">
                 <img v-if="product.thumbnail" :src="`http://localhost:5000${product.thumbnail}`" class="w-12 h-12 object-cover rounded-lg border" />
                 <div v-else class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
@@ -50,6 +51,7 @@
               <td class="px-6 py-4">{{ product.model }}</td>
               <td class="px-6 py-4">{{ product.imei1 }}</td>
               <td class="px-6 py-4 text-xs">{{ formatDate(product.createdAt) }}</td>
+              <td class="px-6 py-4 text-xs">{{ formatDate(product.warrantyEndDate) }}</td>
               <td class="px-6 py-4 font-bold text-slate-800">฿{{ Number(product.sellPrice).toLocaleString() }}</td>
               <td class="px-6 py-4">
                 <span :class="statusClass(product.status)" class="px-3 py-1 rounded-full text-[10px] font-bold uppercase">
@@ -64,11 +66,43 @@
                 </div>
               </td>
             </tr>
-            <tr v-if="filteredProducts.length === 0">
-                <td colspan="8" class="px-6 py-10 text-center text-slate-400">ไม่พบข้อมูลสินค้า</td>
-            </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Card View -->
+      <div v-else class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div v-for="product in sortedProducts" :key="product.id" class="group bg-white rounded-2xl p-5 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.12)] transition-all duration-300 flex flex-col gap-4">
+              <div class="flex items-start gap-4">
+                  <div class="relative">
+                    <img v-if="product.thumbnail" :src="`http://localhost:5000${product.thumbnail}`" class="w-20 h-20 object-cover rounded-xl border border-slate-100" />
+                    <div v-else class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300 border border-slate-100">
+                        <Smartphone class="w-8 h-8" />
+                    </div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                      <p class="font-bold text-slate-900 truncate">{{ product.brand }}</p>
+                      <p class="text-sm text-slate-600 truncate">{{ product.model }}</p>
+                      <p class="text-[11px] text-slate-400 font-mono mt-1 bg-slate-50 inline-block px-1.5 py-0.5 rounded">IMEI: {{ product.imei1 }}</p>
+                      <p class="text-[10px] text-slate-400 mt-1.5">เพิ่มเมื่อ: {{ formatDate(product.createdAt) }}</p>
+                  </div>
+              </div>
+              
+              <div class="flex items-center justify-between border-t border-slate-50 pt-4">
+                <p class="text-lg font-black text-slate-900 tracking-tight">฿{{ Number(product.sellPrice).toLocaleString() }}</p>
+                <span :class="statusClass(product.status)" class="px-3 py-1 rounded-full font-bold uppercase text-[10px] tracking-wider">
+                    {{ translateStatus(product.status) }}
+                </span>
+              </div>
+
+              <div class="flex items-center justify-end border-t border-slate-50 pt-3 mt-auto">
+                <div class="flex space-x-1">
+                    <button @click="printWarranty(product)" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="พิมพ์ใบประกัน"><FileText class="w-4 h-4" /></button>
+                    <button @click="editProduct(product.id)" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="แก้ไข"><Edit3 class="w-4 h-4" /></button>
+                    <button @click="deleteProduct(product.id)" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="ลบ"><Trash2 class="w-4 h-4" /></button>
+                </div>
+              </div>
+          </div>
       </div>
     </div>
   </div>
@@ -80,7 +114,7 @@ import axios from 'axios';
 import { useAuthStore } from '../../store/auth';
 import { useRouter } from 'vue-router';
 import { 
-  Search, Plus, QrCode, Smartphone, Edit3, FileText, Trash2, Download
+  Search, Plus, QrCode, Smartphone, Edit3, FileText, Trash2, Download, Table, LayoutGrid, ChevronDown
 } from 'lucide-vue-next';
 import * as XLSX from 'xlsx';
 import { generateWarrantyReceipt } from '../../utils/pdfGenerator';
@@ -90,13 +124,44 @@ const authStore = useAuthStore();
 const products = ref([]);
 const storeSettings = ref({});
 const searchQuery = ref('');
+const viewMode = ref('table');
+const sortKey = ref('');
+const sortOrder = ref(1);
 
-const filteredProducts = computed(() => {
-    return products.value.filter(p => 
+const columns = [
+    { key: 'thumbnail', label: 'รูปปก' },
+    { key: 'brand', label: 'ยี่ห้อ' },
+    { key: 'model', label: 'รุ่น' },
+    { key: 'imei1', label: 'IMEI' },
+    { key: 'createdAt', label: 'วันที่เพิ่ม' },
+    { key: 'warrantyEndDate', label: 'วันหมดประกัน' },
+    { key: 'sellPrice', label: 'ราคา' },
+    { key: 'status', label: 'สถานะ' },
+    { key: 'actions', label: 'จัดการ' }
+];
+
+const sortBy = (key) => {
+    if (key === 'actions' || key === 'thumbnail') return;
+    if (sortKey.value === key) sortOrder.value *= -1;
+    else {
+        sortKey.value = key;
+        sortOrder.value = 1;
+    }
+};
+
+const sortedProducts = computed(() => {
+    const list = products.value.filter(p => 
         (p.brand?.toLowerCase() || '').includes(searchQuery.value.toLowerCase()) || 
         (p.model?.toLowerCase() || '').includes(searchQuery.value.toLowerCase()) ||
         (p.imei1 || '').includes(searchQuery.value)
     );
+    if (!sortKey.value) return list;
+    return list.sort((a, b) => {
+        let valA = a[sortKey.value];
+        let valB = b[sortKey.value];
+        if (typeof valA === 'string') return valA.localeCompare(valB) * sortOrder.value;
+        return (valA - valB) * sortOrder.value;
+    });
 });
 
 const deleteProduct = async (id) => {
@@ -173,16 +238,28 @@ const formatDate = (dateString) => {
 };
 
 const exportToExcel = () => {
-    const data = filteredProducts.value.map(p => ({
+    const data = sortedProducts.value.map(p => ({
         'ยี่ห้อ': p.brand,
         'รุ่น': p.model,
         'IMEI': p.imei1,
-        'ราคา': p.sellPrice,
+        'เลขซีเรียล': p.serialNumber,
+        'สี': p.color,
+        'ความจุ': p.storage,
+        'ราคาทุน': p.purchasePrice,
+        'ราคาขาย': p.sellPrice,
         'สถานะ': translateStatus(p.status),
-        'วันที่เพิ่ม': formatDate(p.createdAt)
+        'วันที่เพิ่ม': formatDate(p.createdAt),
+        'วันหมดประกัน': formatDate(p.warrantyEndDate),
+        'สุขภาพแบตเตอรี่': p.batteryHealth + '%',
+        'สภาพ': p.condition === 'new' ? 'มือ 1' : 'มือ 2'
     }));
 
     const ws = XLSX.utils.json_to_sheet(data);
+
+    // Apply auto-filter
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    ws['!autofilter'] = { ref: XLSX.utils.encode_range(range) };
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Products");
     XLSX.writeFile(wb, "products_list.xlsx");

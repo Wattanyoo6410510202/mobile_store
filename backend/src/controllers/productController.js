@@ -152,12 +152,44 @@ exports.deleteProductImage = async (req, res) => {
 
 exports.deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findByPk(req.params.id);
+    const product = await Product.findByPk(req.params.id, {
+      include: [{ model: ProductImage, as: 'images' }, { model: require('../models/SellerInfo'), as: 'seller' }]
+    });
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
+
+    // Helper to delete file
+    const deleteFile = (url) => {
+      if (url) {
+        const filePath = path.join(__dirname, '../', url);
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      }
+    };
+
+    // Delete thumbnail
+    deleteFile(product.thumbnail);
+    // Delete barcode
+    deleteFile(product.barcode);
+
+    // Delete gallery images
+    if (product.images) {
+      for (const img of product.images) {
+        deleteFile(img.imageUrl);
+        await img.destroy();
+      }
+    }
+
+    // Delete seller images
+    if (product.seller) {
+      deleteFile(product.seller.idCardImageUrl);
+      deleteFile(product.seller.sellerWithPhoneImageUrl);
+      deleteFile(product.seller.signatureUrl);
+      await product.seller.destroy();
+    }
+
     await product.destroy();
-    res.json({ message: 'Product deleted' });
+    res.json({ message: 'Product and all associated media deleted' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting product', error: error.message });
   }

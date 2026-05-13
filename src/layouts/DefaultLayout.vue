@@ -24,7 +24,7 @@
 
               <div
                 v-if="isUserMenuOpen"
-                class="absolute right-0 mt-2 w-56 rounded-md border bg-white shadow-lg py-1"
+                class="absolute left-0 mt-2 z-50 w-56 rounded-md border bg-white shadow-lg py-1"
                 :style="{ borderColor: 'var(--gh-border-default)' }"
                 role="menu"
               >
