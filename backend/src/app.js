@@ -64,29 +64,33 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => console.log('User disconnected'));
 });
 
-// Sync Database and Start Server
-sequelize.sync()
-  .then(() => {
-    console.log('Database synced');
+// sequelize.sync()
+//   .then(() => {
+//     console.log('Database synced');
     
-    // Seed admin if not exists
-    const User = require('./models/User');
-    const bcrypt = require('bcryptjs');
-    bcrypt.hash('1234', 10).then(hash => {
-        User.findOrCreate({
-            where: { email: 'admin' },
-            defaults: {
-                name: 'Administrator',
-                password: hash,
-                role: 'admin'
-            }
-        });
-    });
+//     // Seed admin if not exists
+//     const User = require('./models/User');
+//     const bcrypt = require('bcryptjs');
+//     bcrypt.hash('1234', 10).then(hash => {
+//         User.findOrCreate({
+//             where: { email: 'admin' },
+//             defaults: {
+//                 name: 'Administrator',
+//                 password: hash,
+//                 role: 'admin'
+//             }
+//         });
+//     });
     
-    http.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  })
-  .catch(err => {
-    console.error('Failed to sync database:', err);
-  });
+//     http.listen(PORT, () => {
+//       console.log(`Server is running on port ${PORT}`);
+//     });
+//   })
+//   .catch(err => {
+//     console.error('Failed to sync database:', err);
+//   });
+
+// Start Server without auto-sync
+http.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

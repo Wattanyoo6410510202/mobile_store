@@ -101,7 +101,8 @@
               <GitPullRequest class="w-4 h-4" />
             </button>
 
-            <button 
+            <router-link
+              to="/admin/reservations"
               class="relative inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
               :style="{ borderColor: 'var(--gh-border-default)' }"
               aria-label="Notifications"
@@ -111,8 +112,7 @@
               <span v-if="reservationStore.unreadCount > 0" class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
                 {{ reservationStore.unreadCount > 9 ? '9+' : reservationStore.unreadCount }}
               </span>
-            </button>
-
+            </router-link>
             <router-link to="/admin/users" class="hidden sm:inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
               :style="{ borderColor: 'var(--gh-border-default)' }"
               aria-label="Users"
