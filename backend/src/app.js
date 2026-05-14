@@ -23,6 +23,14 @@ Product.hasMany(SoftwareTest, { foreignKey: 'productId', as: 'tests' });
 SoftwareTest.belongsTo(Product, { foreignKey: 'productId' });
 
 const app = express();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http, {
+  cors: { origin: '*' }
+});
+
+// Make io accessible in routes
+app.set('io', io);
+
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
@@ -51,8 +59,13 @@ app.get('/', (req, res) => {
   res.send('Phone Store API is running...');
 });
 
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+  socket.on('disconnect', () => console.log('User disconnected'));
+});
+
 // Sync Database and Start Server
-sequelize.sync({ alter: true })
+sequelize.sync()
   .then(() => {
     console.log('Database synced');
     
@@ -70,7 +83,7 @@ sequelize.sync({ alter: true })
         });
     });
     
-    app.listen(PORT, () => {
+    http.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
   })

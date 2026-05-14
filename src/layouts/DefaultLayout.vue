@@ -101,11 +101,16 @@
               <GitPullRequest class="w-4 h-4" />
             </button>
 
-            <button class="inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
+            <button 
+              class="relative inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
               :style="{ borderColor: 'var(--gh-border-default)' }"
               aria-label="Notifications"
+              @click="reservationStore.resetCount()"
             >
               <Inbox class="w-4 h-4" />
+              <span v-if="reservationStore.unreadCount > 0" class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
+                {{ reservationStore.unreadCount > 9 ? '9+' : reservationStore.unreadCount }}
+              </span>
             </button>
 
             <router-link to="/admin/users" class="hidden sm:inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
@@ -190,6 +195,19 @@
       </header>
 
       <section class="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-8 bg-[var(--gh-canvas-subtle)]">
+        <!-- Toast Notification -->
+        <transition name="toast">
+          <div v-if="reservationStore.showToast" class="fixed bottom-5 right-5 z-50 bg-white border border-slate-200 shadow-lg rounded-lg p-4 flex items-center gap-3 animate-bounce">
+            <div class="bg-green-500 rounded-full p-1 text-white">
+              <CalendarCheck class="w-5 h-5" />
+            </div>
+            <div>
+              <p class="font-bold text-sm text-slate-800">มีการจองใหม่!</p>
+              <p class="text-xs text-slate-500">ตรวจสอบรายการจองของคุณ</p>
+            </div>
+          </div>
+        </transition>
+
         <router-view v-slot="{ Component, route }">
           <transition name="fade" mode="out-in">
             <component :is="Component" :key="route.path" />
@@ -203,6 +221,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useAuthStore } from '../store/auth';
+import { useReservationStore } from '../store/reservation';
 import { useRouter, useRoute } from 'vue-router';
 import { 
   LayoutDashboard,
@@ -224,6 +243,7 @@ import {
 } from 'lucide-vue-next';
 
 const authStore = useAuthStore();
+const reservationStore = useReservationStore();
 const router = useRouter();
 const route = useRoute();
 const isUserMenuOpen = ref(false);

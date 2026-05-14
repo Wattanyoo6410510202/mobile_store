@@ -11,6 +11,7 @@ const reservationUploadFields = uploadReservation.fields([
 ]);
 
 router.get('/', auth, checkRole('admin'), reservationController.getAllReservations);
+router.post('/', reservationController.createReservation);
 router.put('/:id/status', auth, checkRole('admin'), reservationController.updateReservationStatus);
 router.put('/:id', auth, checkRole('admin'), reservationUploadFields, reservationController.updateReservation);
 

@@ -26,14 +26,17 @@ exports.checkout = async (req, res) => {
     }
 
     // 3. สร้างรายการจองทีละรายการ
+    const io = req.app.get('io');
     for (const item of cartItems) {
       console.log('Creating reservation for product:', item.product_id);
-      await Reservation.create({
+      const reservation = await Reservation.create({
         product_id: item.product_id,
         customer_id: customer.id,
         user_id: userId,
         status: 'pending'
       }, { transaction });
+      
+      io.emit('new_reservation', reservation);
     }
 
     // 4. ล้างตะกร้า

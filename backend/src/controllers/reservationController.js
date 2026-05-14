@@ -3,6 +3,17 @@ const Product = require('../models/Product');
 const Customer = require('../models/Customer');
 const sequelize = require('../config/database');
 
+exports.createReservation = async (req, res) => {
+  try {
+    const newReservation = await Reservation.create(req.body);
+    const io = req.app.get('io');
+    io.emit('new_reservation', newReservation);
+    res.status(201).json(newReservation);
+  } catch (error) {
+    res.status(500).json({ message: 'Error creating reservation', error: error.message });
+  }
+};
+
 exports.getAllReservations = async (req, res) => {
   try {
     const reservations = await Reservation.findAll({
@@ -23,6 +34,7 @@ exports.updateReservationStatus = async (req, res) => {
     const reservation = await Reservation.findByPk(id);
     if (!reservation) return res.status(404).json({ message: 'Reservation not found' });
     
+    const oldStatus = reservation.status;
     await reservation.update({ 
       status, 
       deposit_amount, 
@@ -31,6 +43,12 @@ exports.updateReservationStatus = async (req, res) => {
       slip_image,
       attachment_file,
     });
+
+    if (status === 'confirmed' && oldStatus !== 'confirmed') {
+      const io = req.app.get('io');
+      io.emit('new_reservation', { message: 'มีการยืนยันการจองใหม่', reservation });
+    }
+
     res.json(reservation);
   } catch (error) {
     res.status(500).json({ message: 'Error updating reservation', error: error.message });
