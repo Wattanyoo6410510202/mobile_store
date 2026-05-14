@@ -49,6 +49,11 @@ const routes = [
         component: () => import('../views/products/Scanner.vue'),
       },
       {
+        path: 'reservations',
+        name: 'ReservationList',
+        component: () => import('../views/ReservationList.vue'),
+      },
+      {
         path: 'users',
         name: 'UserManagement',
         component: () => import('../views/products/UserList.vue'),

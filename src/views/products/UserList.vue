@@ -47,12 +47,17 @@
                 <code class="text-[11px] bg-slate-100 px-2 py-1 rounded-md text-slate-600 font-mono">{{ user.email }}</code>
               </td>
               <td class="px-6 py-4">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border shadow-sm"
-                  :class="user.role === 'admin' ? 'bg-purple-50 text-purple-600 border-purple-100' : 'bg-blue-50 text-blue-600 border-blue-100'">
-                  <ShieldCheck v-if="user.role === 'admin'" class="w-3 h-3" />
-                  <UserCircle2 v-else class="w-3 h-3" />
-                  {{ user.role === 'admin' ? 'ผู้ดูแลระบบ' : 'พนักงาน' }}
-                </span>
+                <div class="flex flex-col gap-2">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border shadow-sm w-fit"
+                    :class="user.role === 'admin' ? 'bg-purple-50 text-purple-600 border-purple-100' : 'bg-blue-50 text-blue-600 border-blue-100'">
+                    <ShieldCheck v-if="user.role === 'admin'" class="w-3 h-3" />
+                    <UserCircle2 v-else class="w-3 h-3" />
+                    {{ user.role === 'admin' ? 'ผู้ดูแลระบบ' : 'พนักงาน' }}
+                  </span>
+                  <span v-if="user.isCustomer" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border border-green-100 bg-green-50 text-green-600 shadow-sm w-fit">
+                    ลูกค้า
+                  </span>
+                </div>
               </td>
               <td class="px-6 py-4 text-slate-500 text-xs font-medium">
                 {{ new Date(user.createdAt).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) }}

@@ -47,7 +47,17 @@ exports.getUsers = async (req, res) => {
     const users = await User.findAll({
       attributes: ['id', 'name', 'email', 'role', 'createdAt']
     });
-    res.json(users);
+    
+    // ดึงลูกค้าทั้งหมดมาเพื่อเปรียบเทียบ (ใช้ email เป็นตัวเช็ค)
+    const customers = await Customer.findAll({ attributes: ['email'] });
+    const customerEmails = new Set(customers.map(c => c.email));
+    
+    const usersWithStatus = users.map(user => ({
+      ...user.toJSON(),
+      isCustomer: customerEmails.has(user.email)
+    }));
+
+    res.json(usersWithStatus);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching users', error: error.message });
   }

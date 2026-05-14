@@ -45,6 +45,11 @@ const Reservation = sequelize.define('Reservation', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  attachment_file: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'ชื่อไฟล์หรือ path เอกสารแนบ',
+  },
 }, {
   timestamps: true,
 });

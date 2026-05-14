@@ -3,8 +3,14 @@ import { defineStore } from 'pinia';
 import axios from 'axios';
 import { useAuthStore } from './auth';
 
+type CartItem = {
+  id: string;
+  Product?: Record<string, unknown>;
+  [key: string]: unknown;
+};
+
 export const useCartStore = defineStore('cart', () => {
-  const items = ref([]);
+  const items = ref<CartItem[]>([]);
   const authStore = useAuthStore();
 
   async function fetchCart() {
@@ -20,7 +26,7 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
-  const addItem = async (product) => {
+  const addItem = async (product: { id: string } & Record<string, unknown>) => {
     if (!authStore.user) {
       throw new Error('กรุณาเข้าสู่ระบบเพื่อใช้งานตะกร้าสินค้า');
     }
@@ -31,13 +37,13 @@ export const useCartStore = defineStore('cart', () => {
         { product_id: product.id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      items.value.push({ ...response.data, Product: product });
+      items.value.push({ ...(response.data as CartItem), Product: product });
     } catch (error) {
       console.error('Error adding to cart:', error);
     }
   };
 
-  const removeItem = async (cartItemId) => {
+  const removeItem = async (cartItemId: string) => {
     try {
       const token = localStorage.getItem('token');
       await axios.delete(`http://localhost:5000/api/cart/${cartItemId}`, {

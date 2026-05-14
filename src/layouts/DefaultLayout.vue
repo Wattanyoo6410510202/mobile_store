@@ -139,6 +139,15 @@
           </router-link>
 
           <router-link
+            to="/admin/reservations"
+            class="inline-flex items-center gap-2 text-sm font-semibold px-2 py-1 rounded-md hover:bg-slate-100 whitespace-nowrap flex-shrink-0"
+            :class="route.name === 'ReservationList' ? 'text-slate-900' : 'text-slate-600'"
+          >
+            <CalendarCheck class="w-4 h-4" />
+            <span>การจอง</span>
+          </router-link>
+
+          <router-link
             to="/admin/products/add"
             class="inline-flex items-center gap-2 text-sm font-semibold px-2 py-1 rounded-md hover:bg-slate-100 whitespace-nowrap flex-shrink-0"
             :class="route.name === 'AddProduct' ? 'text-slate-900' : 'text-slate-600'"
@@ -211,7 +220,7 @@ import {
   QrCode,
   Users,
   FileBarChart,
-  ShoppingCart
+  CalendarCheck,
 } from 'lucide-vue-next';
 
 const authStore = useAuthStore();
@@ -225,6 +234,7 @@ const pageTitle = computed(() => {
     case 'Dashboard': return 'ภาพรวมระบบ';
     case 'ProductList': return 'สต็อกสินค้า';
     case 'AddProduct': return 'เพิ่มสินค้าใหม่';
+    case 'ReservationList': return 'รายการการจอง';
     default: return route.name;
   }
 });
