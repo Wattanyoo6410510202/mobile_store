@@ -56,7 +56,7 @@
       </div>
 
       <p class="text-center mt-6 text-slate-500 text-[10px] font-semibold uppercase tracking-wider">
-        ติดต่อผู้ดูแลระบบเพื่อขอสิทธิ์ใช้งาน
+        ยังไม่มีบัญชี? <router-link to="/register" class="text-blue-600 hover:underline">สมัครสมาชิกที่นี่</router-link>
       </p>
     </div>
   </div>

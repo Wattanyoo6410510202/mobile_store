@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
+import { useCartStore } from './cart';
 
 const api = axios.create({
   baseURL: 'http://localhost:5000/api',
@@ -28,6 +29,11 @@ export const useAuthStore = defineStore('auth', {
         this.token = response.data.token;
         if (this.token) localStorage.setItem('token', this.token);
         localStorage.setItem('user', JSON.stringify(this.user));
+        
+        // Sync cart after login
+        const cartStore = useCartStore();
+        await cartStore.fetchCart();
+        
         return true;
       } catch (error) {
         console.error('Login failed', error);
@@ -35,10 +41,14 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     logout() {
+      const cartStore = useCartStore();
+      cartStore.clearCart();
+      
       this.user = null;
       this.token = null;
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      window.location.reload();
     },
   },
 });

@@ -33,6 +33,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
+app.use('/api/cart', require('./routes/cartRoutes'));
+app.use('/api/checkout', require('./routes/checkoutRoutes'));
+app.use('/api/reservations', require('./routes/reservationRoutes'));
 app.get('/api/settings', async (req, res) => {
     const settings = await Settings.findByPk(1) || await Settings.create({});
     res.json(settings);

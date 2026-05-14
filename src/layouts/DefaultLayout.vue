@@ -181,9 +181,9 @@
       </header>
 
       <section class="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-8 bg-[var(--gh-canvas-subtle)]">
-        <router-view v-slot="{ Component }">
+        <router-view v-slot="{ Component, route }">
           <transition name="fade" mode="out-in">
-            <component :is="Component" />
+            <component :is="Component" :key="route.path" />
           </transition>
         </router-view>
       </section>
@@ -210,7 +210,8 @@ import {
   ChevronDown,
   QrCode,
   Users,
-  FileBarChart
+  FileBarChart,
+  ShoppingCart
 } from 'lucide-vue-next';
 
 const authStore = useAuthStore();

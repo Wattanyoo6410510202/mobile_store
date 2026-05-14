@@ -1,10 +1,11 @@
 const User = require('../models/User');
+const Customer = require('../models/Customer');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, phone } = req.body;
 
     // Check if user exists
     const existingUser = await User.findOne({ where: { email } });
@@ -22,6 +23,15 @@ exports.register = async (req, res) => {
       password: hashedPassword,
       role: role || 'staff',
     });
+
+    // Create customer record if user is a customer
+    if (role !== 'admin' && role !== 'staff') {
+      await Customer.create({
+        name,
+        email,
+        phone: phone || '0000000000' // Default placeholder
+      });
+    }
 
     res.status(201).json({
       message: 'User registered successfully',

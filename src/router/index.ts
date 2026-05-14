@@ -14,6 +14,12 @@ const routes = [
     meta: { guest: true },
   },
   {
+    path: '/register',
+    name: 'Register',
+    component: () => import('../views/Register.vue'),
+    meta: { guest: true },
+  },
+  {
     path: '/admin',
     component: () => import('../layouts/DefaultLayout.vue'),
     children: [
@@ -46,6 +52,11 @@ const routes = [
         path: 'users',
         name: 'UserManagement',
         component: () => import('../views/products/UserList.vue'),
+      },
+      {
+        path: 'reports',
+        name: 'Reports',
+        component: () => import('../views/Dashboard.vue'),
       }
     ],
     meta: { requiresAuth: true },
@@ -57,14 +68,23 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, _from, next) => {
+router.beforeEach((to, _from) => {
   const authStore = useAuthStore();
+  
+  // Check if route requires admin access
+  if (to.path.startsWith('/admin')) {
+    if (!authStore.isAuthenticated) {
+      return '/login';
+    }
+    if (authStore.user?.role !== 'admin') {
+      return '/';
+    }
+  }
+
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next('/login');
+    return '/login';
   } else if (to.meta.guest && authStore.isAuthenticated) {
-    next('/');
-  } else {
-    next();
+    return '/';
   }
 });
 

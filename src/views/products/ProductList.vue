@@ -128,10 +128,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '../../store/auth';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { 
   Search, Plus, QrCode, Smartphone, Edit3, FileText, Trash2, Download, Table, LayoutGrid, ChevronDown
 } from 'lucide-vue-next';
@@ -139,6 +139,7 @@ import * as XLSX from 'xlsx';
 import { generateWarrantyReceipt } from '../../utils/pdfGenerator';
 
 const router = useRouter();
+const route = useRoute();
 const authStore = useAuthStore();
 const products = ref([]);
 const storeSettings = ref({});
@@ -158,6 +159,21 @@ const columns = [
     { key: 'status', label: 'สถานะ' },
     { key: 'actions', label: 'จัดการ' }
 ];
+
+onMounted(() => {
+    fetchProducts();
+    fetchSettings();
+});
+
+watch(
+  () => route.path,
+  () => {
+    if (route.name === 'ProductList') {
+        fetchProducts();
+        fetchSettings();
+    }
+  }
+);
 
 const sortBy = (key) => {
     if (key === 'actions' || key === 'thumbnail') return;
@@ -224,20 +240,19 @@ const updateStatus = async (id, newStatus) => {
 };
 
 const fetchProducts = async () => {
-  console.log('Fetching products, token:', authStore.token);
+  console.log('DEBUG: ProductList fetchProducts called');
   if (!authStore.token) {
-    console.error('No Auth Token found!');
+    console.warn('DEBUG: No token available in authStore');
     return;
   }
   try {
     const response = await axios.get('http://localhost:5000/api/products', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
-    console.log('API Response:', response.data);
+    console.log('DEBUG: ProductList API response received', response.data);
     products.value = response.data;
   } catch (error) {
-    console.error('Failed to fetch products:', error);
-    alert('โหลดข้อมูลล้มเหลว: ' + error.message);
+    console.error('DEBUG: Failed to fetch products:', error);
   }
 };
 
@@ -305,9 +320,4 @@ const exportToExcel = () => {
     XLSX.utils.book_append_sheet(wb, ws, "Products");
     XLSX.writeFile(wb, "products_list.xlsx");
 };
-
-onMounted(() => {
-    fetchProducts();
-    fetchSettings();
-});
 </script>

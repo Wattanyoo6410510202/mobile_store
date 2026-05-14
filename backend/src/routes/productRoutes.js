@@ -2,11 +2,12 @@ const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
 const auth = require('../middleware/auth');
+const checkRole = require('../middleware/checkRole');
 const upload = require('../middleware/upload');
 
 router.get('/', productController.getProducts);
 router.get('/:id', productController.getProduct);
-router.post('/', auth, upload.fields([
+router.post('/', auth, checkRole('admin'), upload.fields([
   { name: 'images', maxCount: 20 },
   { name: 'idCardImage', maxCount: 1 },
   { name: 'sellerWithPhoneImage', maxCount: 1 },
@@ -30,7 +31,7 @@ router.post('/', auth, upload.fields([
   { name: 'lens', maxCount: 1 }
 ]), productController.createProduct);
 
-router.put('/:id', auth, upload.fields([
+router.put('/:id', auth, checkRole('admin'), upload.fields([
   { name: 'images', maxCount: 20 },
   { name: 'idCardImage', maxCount: 1 },
   { name: 'sellerWithPhoneImage', maxCount: 1 },
@@ -54,7 +55,7 @@ router.put('/:id', auth, upload.fields([
   { name: 'lens', maxCount: 1 }
 ]), productController.updateProduct);
 
-router.delete('/:id', auth, productController.deleteProduct);
-router.delete('/images/:imageId', auth, productController.deleteProductImage);
+router.delete('/:id', auth, checkRole('admin'), productController.deleteProduct);
+router.delete('/images/:imageId', auth, checkRole('admin'), productController.deleteProductImage);
 
 module.exports = router;
