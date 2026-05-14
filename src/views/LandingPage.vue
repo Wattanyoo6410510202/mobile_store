@@ -141,7 +141,7 @@
               class="group bg-white/90 border border-slate-100 rounded-lg p-4 hover:shadow-xl hover:bg-white transition-all duration-500 hover-reveal">
               <!-- Product Image Area (No Gray BG) -->
               <div class="relative aspect-square rounded-md overflow-hidden mb-6 flex items-center justify-center">
-                <img v-if="product.thumbnail" :src="`http://localhost:5000${product.thumbnail}`"
+                <img v-if="product.thumbnail" :src="assetUrl(product.thumbnail)"
                   class="w-full h-full object-contain p-2 transition-transform duration-700 group-hover:scale-110" />
                 <div v-else class="w-full h-full flex items-center justify-center">
                   <Smartphone class="w-12 h-12 text-slate-200" />
@@ -295,6 +295,8 @@ import { ShoppingBag, ArrowRight, MoreHorizontal, Check, Menu, LogOut } from 'lu
 import { useCartStore } from '../store/cart';
 import { useAuthStore } from '../store/auth';
 import CartModal from '../components/CartModal.vue';
+import { useRouter } from 'vue-router';
+import { getApiBasePath, assetUrl } from '../config/api';
 
 const isCartOpen = ref(false);
 const cartStore = useCartStore();
@@ -303,8 +305,6 @@ const availableProducts = ref([]);
 const loading = ref(true);
 const selectedBrand = ref(null);
 const showAll = ref(false);
-
-import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const addToCart = (product) => {
@@ -354,7 +354,7 @@ const brandOptions = [
 
 const fetchAvailableProducts = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/products');
+    const response = await axios.get(`${getApiBasePath()}/products`);
     availableProducts.value = response.data.filter(p => p.status === 'available');
   } catch (error) {
     console.error('Error fetching products:', error);

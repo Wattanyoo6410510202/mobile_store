@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 import { useCartStore } from './cart';
+import { getApiBasePath } from '../config/api';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: getApiBasePath(),
 });
 
 type AuthUser = {

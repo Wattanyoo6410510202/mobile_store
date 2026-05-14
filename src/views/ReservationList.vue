@@ -202,15 +202,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
+import { storeToRefs } from 'pinia';
+import { useRoute } from 'vue-router';
 import { useAuthStore } from '../store/auth';
+import { useReservationStore } from '../store/reservation';
+import { getApiBasePath, assetUrl } from '../config/api';
 import { Loader2, Search, Download, Pencil, X } from 'lucide-vue-next';
 import * as XLSX from 'xlsx';
 
-const API_BASE = 'http://localhost:5000';
-
 const authStore = useAuthStore();
+const route = useRoute();
+const reservationStore = useReservationStore();
+const { reservationSyncNonce } = storeToRefs(reservationStore);
 
 type ProductRow = { brand?: string; model?: string };
 type CustomerRow = { name?: string; phone?: string };
@@ -248,8 +253,8 @@ const editModalError = ref('');
 
 function fileUrl(path: string) {
   if (!path) return '#';
-  if (path.startsWith('http')) return path;
-  return `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;
+  const u = assetUrl(path);
+  return u || '#';
 }
 
 function translateReservationStatus(status: string) {
@@ -370,7 +375,7 @@ async function fetchReservations() {
   loading.value = true;
   error.value = '';
   try {
-    const { data } = await axios.get<ReservationRow[]>(`${API_BASE}/api/reservations`, {
+    const { data } = await axios.get<ReservationRow[]>(`${getApiBasePath()}/reservations`, {
       headers: { Authorization: `Bearer ${authStore.token}` },
     });
     reservations.value = Array.isArray(data) ? data : [];
@@ -390,12 +395,12 @@ async function onStatusChange(row: ReservationRow, e: Event) {
   updatingId.value = row.id;
   error.value = '';
   try {
-    await axios.put(
-      `${API_BASE}/api/reservations/${row.id}/status`,
+    const { data } = await axios.put<ReservationRow>(
+      `${getApiBasePath()}/reservations/${row.id}/status`,
       { status: newStatus },
       { headers: { Authorization: `Bearer ${authStore.token}` } },
     );
-    row.status = newStatus;
+    mergeUpdatedRow(data);
   } catch (e: unknown) {
     const err = e as { response?: { data?: { message?: string } } };
     error.value = err.response?.data?.message || 'อัปเดตสถานะไม่สำเร็จ';
@@ -450,6 +455,31 @@ function mergeUpdatedRow(updated: ReservationRow) {
   }
 }
 
+/** Merge socket `reservation:sync` rows without refetching the full list. */
+function mergeReservationRowsFromServer(incoming: ReservationRow[]) {
+  const byId = new Map(reservations.value.map((r) => [r.id, { ...r }]));
+  for (const row of incoming) {
+    const prev = byId.get(row.id);
+    if (prev) {
+      byId.set(row.id, {
+        ...prev,
+        ...row,
+        Product: row.Product ?? prev.Product,
+        Customer: row.Customer ?? prev.Customer,
+      });
+    } else {
+      byId.set(row.id, { ...row });
+    }
+  }
+  const merged = Array.from(byId.values());
+  merged.sort((a, b) => {
+    const ta = new Date(a.createdAt ?? 0).getTime();
+    const tb = new Date(b.createdAt ?? 0).getTime();
+    return tb - ta;
+  });
+  reservations.value = merged;
+}
+
 async function submitEdit() {
   if (!editingRow.value) return;
   savingEdit.value = true;
@@ -468,7 +498,7 @@ async function submitEdit() {
 
   try {
     const { data } = await axios.put<ReservationRow>(
-      `${API_BASE}/api/reservations/${editingRow.value.id}`,
+      `${getApiBasePath()}/reservations/${editingRow.value.id}`,
       fd,
       {
         headers: {
@@ -488,4 +518,11 @@ async function submitEdit() {
 }
 
 onMounted(fetchReservations);
+
+watch(reservationSyncNonce, () => {
+  if (route.name !== 'ReservationList') return;
+  const rows = reservationStore.reservationSyncRows as ReservationRow[];
+  if (!rows?.length) return;
+  mergeReservationRowsFromServer(rows);
+});
 </script>

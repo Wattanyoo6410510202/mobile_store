@@ -2,6 +2,7 @@ import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import axios from 'axios';
 import { useAuthStore } from './auth';
+import { getApiBasePath } from '../config/api';
 
 type CartItem = {
   id: string;
@@ -17,7 +18,7 @@ export const useCartStore = defineStore('cart', () => {
     if (!authStore.user) return;
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/cart', {
+      const response = await axios.get(`${getApiBasePath()}/cart`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       items.value = response.data;
@@ -33,7 +34,7 @@ export const useCartStore = defineStore('cart', () => {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/api/cart', 
+      const response = await axios.post(`${getApiBasePath()}/cart`, 
         { product_id: product.id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -46,7 +47,7 @@ export const useCartStore = defineStore('cart', () => {
   const removeItem = async (cartItemId: string) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/cart/${cartItemId}`, {
+      await axios.delete(`${getApiBasePath()}/cart/${cartItemId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       items.value = items.value.filter(i => i.id !== cartItemId);

@@ -1,34 +1,56 @@
 import { defineStore } from 'pinia';
-import { io } from 'socket.io-client';
+import { io, type Socket } from 'socket.io-client';
+import { getApiOrigin } from '../config/api';
 
-const socket = io('http://localhost:5000'); // Ensure this matches your backend port
+let socket: Socket | null = null;
+let socketListenersBound = false;
+
+function getSocket(): Socket {
+  if (!socket) {
+    socket = io(getApiOrigin(), { autoConnect: true });
+  }
+  return socket;
+}
 
 export const useReservationStore = defineStore('reservation', {
   state: () => ({
     unreadCount: 0,
     showToast: false,
     latestReservation: null as any,
+    /** Bumped when `reservation:sync` delivers rows to merge on the admin list. */
+    reservationSyncNonce: 0,
+    reservationSyncRows: [] as any[],
   }),
   actions: {
     initSocket() {
-      socket.on('connect', () => {
-        console.log('Socket connected:', socket.id);
+      const s = getSocket();
+      if (socketListenersBound) return;
+      socketListenersBound = true;
+
+      s.on('connect', () => {
+        console.log('Socket connected:', s.id);
       });
-      socket.on('new_reservation', (data) => {
+      s.on('new_reservation', (data) => {
         console.log('New reservation received:', data);
         this.unreadCount++;
         this.latestReservation = data;
         this.triggerAlert();
       });
+      s.on('reservation:sync', (payload: { rows?: unknown[] }) => {
+        const rows = payload?.rows;
+        if (!Array.isArray(rows) || rows.length === 0) return;
+        this.reservationSyncRows = rows;
+        this.reservationSyncNonce++;
+      });
     },
     triggerAlert() {
-      // Play sound
       const audio = new Audio('/sounds/notification.mp3');
-      audio.play().catch(e => console.log('Audio playback failed:', e));
-      
-      // Show toast
+      audio.play().catch((e) => console.log('Audio playback failed:', e));
+
       this.showToast = true;
-      setTimeout(() => { this.showToast = false; }, 5000);
+      setTimeout(() => {
+        this.showToast = false;
+      }, 5000);
     },
     resetCount() {
       this.unreadCount = 0;

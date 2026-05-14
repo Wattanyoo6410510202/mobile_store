@@ -1,8 +1,10 @@
 const Cart = require('../models/Cart');
 const Reservation = require('../models/Reservation');
 const Customer = require('../models/Customer');
+const Product = require('../models/Product');
 const User = require('../models/User');
 const sequelize = require('../config/database');
+const { emitReservationSync } = require('../utils/reservationSocket');
 
 exports.checkout = async (req, res) => {
   const transaction = await sequelize.transaction();
@@ -27,6 +29,7 @@ exports.checkout = async (req, res) => {
 
     // 3. สร้างรายการจองทีละรายการ
     const io = req.app.get('io');
+    const createdReservations = [];
     for (const item of cartItems) {
       console.log('Creating reservation for product:', item.product_id);
       const reservation = await Reservation.create({
@@ -35,14 +38,29 @@ exports.checkout = async (req, res) => {
         user_id: userId,
         status: 'pending'
       }, { transaction });
-      
-      io.emit('new_reservation', reservation);
+      createdReservations.push(reservation);
     }
 
     // 4. ล้างตะกร้า
     await Cart.destroy({ where: { user_id: userId }, transaction });
 
     await transaction.commit();
+
+    const ids = createdReservations.map((r) => r.id);
+    const rowsWithIncludes =
+      ids.length > 0
+        ? await Reservation.findAll({
+            where: { id: ids },
+            include: [Product, Customer],
+            order: [['createdAt', 'DESC']],
+          })
+        : [];
+
+    for (const r of createdReservations) {
+      io.emit('new_reservation', r);
+    }
+    emitReservationSync(req, rowsWithIncludes);
+
     res.json({ message: 'จองสินค้าสำเร็จ!' });
   } catch (error) {
     await transaction.rollback();

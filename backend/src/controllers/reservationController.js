@@ -2,12 +2,17 @@ const Reservation = require('../models/Reservation');
 const Product = require('../models/Product');
 const Customer = require('../models/Customer');
 const sequelize = require('../config/database');
+const { emitReservationSync } = require('../utils/reservationSocket');
 
 exports.createReservation = async (req, res) => {
   try {
     const newReservation = await Reservation.create(req.body);
     const io = req.app.get('io');
-    io.emit('new_reservation', newReservation);
+    const full = await Reservation.findByPk(newReservation.id, {
+      include: [Product, Customer],
+    });
+    io.emit('new_reservation', full || newReservation);
+    emitReservationSync(req, full ? [full] : [newReservation]);
     res.status(201).json(newReservation);
   } catch (error) {
     res.status(500).json({ message: 'Error creating reservation', error: error.message });
@@ -44,12 +49,17 @@ exports.updateReservationStatus = async (req, res) => {
       attachment_file,
     });
 
+    const fresh = await Reservation.findByPk(id, {
+      include: [Product, Customer],
+    });
+
     if (status === 'confirmed' && oldStatus !== 'confirmed') {
       const io = req.app.get('io');
-      io.emit('new_reservation', { message: 'มีการยืนยันการจองใหม่', reservation });
+      io.emit('new_reservation', { message: 'มีการยืนยันการจองใหม่', reservation: fresh });
     }
+    emitReservationSync(req, fresh ? [fresh] : []);
 
-    res.json(reservation);
+    res.json(fresh);
   } catch (error) {
     res.status(500).json({ message: 'Error updating reservation', error: error.message });
   }
@@ -92,6 +102,7 @@ exports.updateReservation = async (req, res) => {
     const fresh = await Reservation.findByPk(id, {
       include: [Product, Customer],
     });
+    emitReservationSync(req, fresh ? [fresh] : []);
     res.json(fresh);
   } catch (error) {
     res.status(500).json({ message: 'Error updating reservation', error: error.message });

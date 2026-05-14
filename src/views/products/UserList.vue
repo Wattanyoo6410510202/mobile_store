@@ -160,6 +160,7 @@
 import { ref, onMounted, reactive } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '../../store/auth';
+import { getApiBasePath } from '../../config/api';
 import { 
   Users, 
   UserPlus, 
@@ -185,7 +186,7 @@ const newUser = reactive({
 
 const fetchUsers = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/auth/users', {
+    const response = await axios.get(`${getApiBasePath()}/auth/users`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     users.value = response.data;
@@ -197,7 +198,7 @@ const fetchUsers = async () => {
 const handleAddUser = async () => {
   loading.value = true;
   try {
-    await axios.post('http://localhost:5000/api/auth/register', newUser, {
+    await axios.post(`${getApiBasePath()}/auth/register`, newUser, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     await fetchUsers();
@@ -217,7 +218,7 @@ const handleAddUser = async () => {
 const deleteUser = async (id) => {
   if (!confirm('ยืนยันการลบผู้ใช้งานนี้?')) return;
   try {
-    await axios.delete(`http://localhost:5000/api/auth/users/${id}`, {
+    await axios.delete(`${getApiBasePath()}/auth/users/${id}`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     await fetchUsers();

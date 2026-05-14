@@ -42,7 +42,7 @@
           <tbody class="divide-y" :style="{ borderColor: 'var(--gh-border-muted)' }">
             <tr v-for="product in sortedProducts" :key="product.id" class="hover:bg-[var(--gh-canvas-subtle)] transition">
               <td class="px-6 py-4">
-                <img v-if="product.thumbnail" :src="product.thumbnail.startsWith('http') ? product.thumbnail : `http://localhost:5000${product.thumbnail}`" class="w-12 h-12 object-cover rounded-lg border" />
+                <img v-if="product.thumbnail" :src="assetUrl(product.thumbnail)" class="w-12 h-12 object-cover rounded-lg border" />
                 <div v-else class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
                   <Smartphone class="w-6 h-6" />
                 </div>
@@ -83,7 +83,7 @@
           <div v-for="product in sortedProducts" :key="product.id" class="group bg-white rounded-2xl p-5 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.12)] transition-all duration-300 flex flex-col gap-4">
               <div class="flex items-start gap-4">
                   <div class="relative">
-                    <img v-if="product.thumbnail" :src="product.thumbnail.startsWith('http') ? product.thumbnail : `http://localhost:5000${product.thumbnail}`" class="w-20 h-20 object-cover rounded-xl border border-slate-100" />
+                    <img v-if="product.thumbnail" :src="assetUrl(product.thumbnail)" class="w-20 h-20 object-cover rounded-xl border border-slate-100" />
                     <div v-else class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300 border border-slate-100">
                         <Smartphone class="w-8 h-8" />
                     </div>
@@ -137,6 +137,7 @@ import {
 } from 'lucide-vue-next';
 import * as XLSX from 'xlsx';
 import { generateWarrantyReceipt } from '../../utils/pdfGenerator';
+import { getApiBasePath, assetUrl } from '../../config/api';
 
 const router = useRouter();
 const route = useRoute();
@@ -202,7 +203,7 @@ const sortedProducts = computed(() => {
 const deleteProduct = async (id) => {
   if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบสินค้านี้?')) {
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`, {
+      await axios.delete(`${getApiBasePath()}/products/${id}`, {
         headers: { Authorization: `Bearer ${authStore.token}` }
       });
       await fetchProducts();
@@ -225,7 +226,7 @@ const updateStatus = async (id, newStatus) => {
       if (newStatus === 'sold') {
         updateData.saleDate = new Date().toISOString();
       }
-      await axios.put(`http://localhost:5000/api/products/${id}`, updateData, {
+      await axios.put(`${getApiBasePath()}/products/${id}`, updateData, {
         headers: { Authorization: `Bearer ${authStore.token}` }
       });
       await fetchProducts();
@@ -246,7 +247,7 @@ const fetchProducts = async () => {
     return;
   }
   try {
-    const response = await axios.get('http://localhost:5000/api/products', {
+    const response = await axios.get(`${getApiBasePath()}/products`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     console.log('DEBUG: ProductList API response received', response.data);
@@ -258,7 +259,7 @@ const fetchProducts = async () => {
 
 const fetchSettings = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/settings', {
+    const response = await axios.get(`${getApiBasePath()}/settings`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     storeSettings.value = response.data;

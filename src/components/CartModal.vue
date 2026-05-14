@@ -19,7 +19,7 @@
       <div v-else class="space-y-6">
         <div v-for="item in cartStore.items" :key="item.id" class="flex items-center justify-between border-b border-slate-100 pb-4">
           <div class="flex items-center space-x-4">
-            <img :src="`http://localhost:5000${item.Product.thumbnail}`" class="w-16 h-16 object-cover rounded-lg" />
+            <img :src="assetUrl(item.Product?.thumbnail)" class="w-16 h-16 object-cover rounded-lg" />
             <div>
               <h3 class="font-bold text-sm">{{ item.Product.model }}</h3>
               <p class="text-[10px] text-slate-400 font-bold uppercase">{{ item.Product.brand }}</p>
@@ -50,6 +50,7 @@ import { ref, computed } from 'vue';
 import axios from 'axios';
 import { useCartStore } from '../store/cart';
 import { X } from 'lucide-vue-next';
+import { getApiBasePath, assetUrl } from '../config/api';
 
 defineProps({ isOpen: Boolean });
 const emit = defineEmits(['close']);
@@ -62,7 +63,7 @@ const handleCheckout = async () => {
   loading.value = true;
   try {
     const token = localStorage.getItem('token');
-    await axios.post('http://localhost:5000/api/checkout', {}, {
+    await axios.post(`${getApiBasePath()}/checkout`, {}, {
       headers: { Authorization: `Bearer ${token}` }
     });
     alert('จองสินค้าสำเร็จ!');

@@ -90,6 +90,7 @@
 import { reactive, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '../store/auth';
+import { getApiBasePath } from '../config/api';
 import { 
   Package, 
   CheckCircle, 
@@ -116,7 +117,7 @@ const currentDate = computed(() => {
 
 const fetchStats = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/products', {
+    const response = await axios.get(`${getApiBasePath()}/products`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     const products = response.data;

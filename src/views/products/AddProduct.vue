@@ -548,6 +548,7 @@ import {
   ArrowLeft, ArrowRight, Smartphone, Camera, X, ClipboardCheck, 
   UserCheck, CheckCircle2, AlertTriangle, PenTool, FileText, Check
 } from 'lucide-vue-next';
+import { getApiBasePath, assetUrl } from '../../config/api';
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -658,7 +659,7 @@ const resolveUrl = (path) => {
     try { return URL.createObjectURL(path); } catch (e) { return null; }
   }
   if (typeof path !== 'string') return null;
-  return path.startsWith('http') ? path : `http://localhost:5000${path}`;
+  return path.startsWith('http') ? path : assetUrl(path);
 };
 
 const getImageForCategory = (category) => {
@@ -696,7 +697,7 @@ const deleteCategoryImage = async (category) => {
   if (existing) {
     if (!confirm(`ยืนยันการลบรูปภาพหมวดหมู่ ${category}?`)) return;
     try {
-      await axios.delete(`http://localhost:5000/api/products/images/${existing.id}`, {
+      await axios.delete(`${getApiBasePath()}/products/images/${existing.id}`, {
         headers: { Authorization: `Bearer ${authStore.token}` }
       });
       existingImages.value = existingImages.value.filter(img => img.id !== existing.id);
@@ -712,7 +713,7 @@ const deleteVdo360 = async () => {
   if (!confirm('ยืนยันการลบวิดีโอ 360?')) return;
   try {
     const id = route.params.id;
-    await axios.put(`http://localhost:5000/api/products/${id}`, { vdo360: null }, {
+    await axios.put(`${getApiBasePath()}/products/${id}`, { vdo360: null }, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     form.vdo360 = null;
@@ -727,7 +728,7 @@ const fetchProduct = async () => {
   fetching.value = true;
   try {
     const id = route.params.id;
-    const response = await axios.get(`http://localhost:5000/api/products/${id}`, {
+    const response = await axios.get(`${getApiBasePath()}/products/${id}`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     const data = response.data;
@@ -769,7 +770,7 @@ const handleFileUpload = (event) => {
 const deleteImage = async (imageId) => {
   if (!confirm('ยืนยันการลบรูปภาพนี้?')) return;
   try {
-    await axios.delete(`http://localhost:5000/api/products/images/${imageId}`, {
+    await axios.delete(`${getApiBasePath()}/products/images/${imageId}`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     existingImages.value = existingImages.value.filter(img => img.id !== imageId);
@@ -782,7 +783,7 @@ const deleteImageThumbnail = async () => {
   if (!confirm('ยืนยันการลบรูปปกนี้?')) return;
   try {
     const id = route.params.id;
-    await axios.put(`http://localhost:5000/api/products/${id}`, { thumbnail: null }, {
+    await axios.put(`${getApiBasePath()}/products/${id}`, { thumbnail: null }, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     existingThumbnail.value = null;
@@ -812,8 +813,8 @@ const handleSubmit = async () => {
     });
     
     const url = isEdit.value 
-      ? `http://localhost:5000/api/products/${route.params.id}`
-      : 'http://localhost:5000/api/products';
+      ? `${getApiBasePath()}/products/${route.params.id}`
+      : `${getApiBasePath()}/products`;
       
     const method = isEdit.value ? 'put' : 'post';
     

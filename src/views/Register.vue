@@ -72,6 +72,7 @@ import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { Smartphone, User, Lock, Mail } from 'lucide-vue-next';
+import { getApiBasePath } from '../config/api';
 
 const name = ref('');
 const email = ref('');
@@ -85,7 +86,7 @@ const handleRegister = async () => {
   loading.value = true;
   error.value = '';
   try {
-    await axios.post('http://localhost:5000/api/auth/register', {
+    await axios.post(`${getApiBasePath()}/auth/register`, {
       name: name.value,
       email: email.value,
       password: password.value,
