@@ -26,7 +26,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
@@ -48,16 +49,16 @@ app.get('/', (req, res) => {
 });
 
 // Sync Database and Start Server
-sequelize.sync({ force: true })
+sequelize.sync({ alter: true })
   .then(() => {
     console.log('Database synced');
     
-    // Seed admin if not exists (safer than force: true)
+    // Seed admin if not exists
     const User = require('./models/User');
     const bcrypt = require('bcryptjs');
-    bcrypt.hash('admin123', 10).then(hash => {
+    bcrypt.hash('1234', 10).then(hash => {
         User.findOrCreate({
-            where: { email: 'admin@example.com' },
+            where: { email: 'admin' },
             defaults: {
                 name: 'Administrator',
                 password: hash,

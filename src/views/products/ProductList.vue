@@ -42,7 +42,7 @@
           <tbody class="divide-y" :style="{ borderColor: 'var(--gh-border-muted)' }">
             <tr v-for="product in sortedProducts" :key="product.id" class="hover:bg-[var(--gh-canvas-subtle)] transition">
               <td class="px-6 py-4">
-                <img v-if="product.thumbnail" :src="`http://localhost:5000${product.thumbnail}`" class="w-12 h-12 object-cover rounded-lg border" />
+                <img v-if="product.thumbnail" :src="product.thumbnail.startsWith('http') ? product.thumbnail : `http://localhost:5000${product.thumbnail}`" class="w-12 h-12 object-cover rounded-lg border" />
                 <div v-else class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
                   <Smartphone class="w-6 h-6" />
                 </div>
@@ -54,9 +54,17 @@
               <td class="px-6 py-4 text-xs">{{ formatDate(product.warrantyEndDate) }}</td>
               <td class="px-6 py-4 font-bold text-slate-800">฿{{ Number(product.sellPrice).toLocaleString() }}</td>
               <td class="px-6 py-4">
-                <span :class="statusClass(product.status)" class="px-3 py-1 rounded-full text-[10px] font-bold uppercase">
-                  {{ translateStatus(product.status) }}
-                </span>
+                <select 
+                  :value="product.status" 
+                  @change="e => updateStatus(product.id, e.target.value)"
+                  :class="statusClass(product.status)"
+                  class="gh-input !py-1 !px-2 !text-[10px] font-[1000] uppercase rounded-full border-none cursor-pointer focus:ring-1 focus:ring-blue-400 appearance-none text-center"
+                >
+                  <option value="available">พร้อมขาย</option>
+                  <option value="sold">ขายแล้ว</option>
+                  <option value="reserved">จองแล้ว</option>
+                  <option value="repair">ส่งซ่อม</option>
+                </select>
               </td>
               <td class="px-6 py-4">
                 <div class="flex space-x-2">
@@ -75,7 +83,7 @@
           <div v-for="product in sortedProducts" :key="product.id" class="group bg-white rounded-2xl p-5 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.12)] transition-all duration-300 flex flex-col gap-4">
               <div class="flex items-start gap-4">
                   <div class="relative">
-                    <img v-if="product.thumbnail" :src="`http://localhost:5000${product.thumbnail}`" class="w-20 h-20 object-cover rounded-xl border border-slate-100" />
+                    <img v-if="product.thumbnail" :src="product.thumbnail.startsWith('http') ? product.thumbnail : `http://localhost:5000${product.thumbnail}`" class="w-20 h-20 object-cover rounded-xl border border-slate-100" />
                     <div v-else class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300 border border-slate-100">
                         <Smartphone class="w-8 h-8" />
                     </div>
@@ -89,10 +97,21 @@
               </div>
               
               <div class="flex items-center justify-between border-t border-slate-50 pt-4">
-                <p class="text-lg font-black text-slate-900 tracking-tight">฿{{ Number(product.sellPrice).toLocaleString() }}</p>
-                <span :class="statusClass(product.status)" class="px-3 py-1 rounded-full font-bold uppercase text-[10px] tracking-wider">
-                    {{ translateStatus(product.status) }}
-                </span>
+                <p class="text-xl font-black text-slate-900 tracking-tight">฿{{ Number(product.sellPrice).toLocaleString() }}</p>
+                <div class="relative flex items-center group">
+                  <select 
+                    :value="product.status" 
+                    @change="e => updateStatus(product.id, e.target.value)"
+                    :class="statusClass(product.status)"
+                    class="appearance-none pl-4 pr-9 py-2 text-[10px] font-black uppercase rounded-2xl border-none cursor-pointer focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm group-hover:shadow-md"
+                  >
+                    <option value="available">พร้อมขาย</option>
+                    <option value="sold">ขายแล้ว</option>
+                    <option value="reserved">จองแล้ว</option>
+                    <option value="repair">ส่งซ่อม</option>
+                  </select>
+                  <ChevronDown class="w-3.5 h-3.5 absolute right-3 pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity" />
+                </div>
               </div>
 
               <div class="flex items-center justify-end border-t border-slate-50 pt-3 mt-auto">
@@ -180,6 +199,28 @@ const deleteProduct = async (id) => {
 
 const editProduct = (id) => {
   router.push(`/admin/products/edit/${id}`);
+};
+
+const updateStatus = async (id, newStatus) => {
+  const confirmMsg = newStatus === 'sold' ? 'ยืนยันการปิดการขายสินค้านี้?' : `ยืนยันการเปลี่ยนสถานะเป็น "${translateStatus(newStatus)}"?`;
+  if (confirm(confirmMsg)) {
+    try {
+      const updateData = { status: newStatus };
+      if (newStatus === 'sold') {
+        updateData.saleDate = new Date().toISOString();
+      }
+      await axios.put(`http://localhost:5000/api/products/${id}`, updateData, {
+        headers: { Authorization: `Bearer ${authStore.token}` }
+      });
+      await fetchProducts();
+    } catch (error) {
+      console.error('Failed to update product status', error);
+      alert('เกิดข้อผิดพลาดในการอัปเดตสถานะสินค้า');
+    }
+  } else {
+    // Refresh to reset the dropdown value if cancelled
+    await fetchProducts();
+  }
 };
 
 const fetchProducts = async () => {

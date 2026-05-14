@@ -48,6 +48,29 @@
       </div>
     </div>
 
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-2 sm:grid-cols-2 gap-4 lg:gap-6">
+      <router-link to="/admin/users" class="action-card group">
+        <div class="icon-box bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+          <Users class="w-6 h-6" />
+        </div>
+        <div class="text-left">
+          <h3 class="text-sm font-bold text-slate-800">จัดการผู้ใช้</h3>
+          <p class="text-[10px] text-slate-400 font-medium">เพิ่ม ลบ หรือแก้ไขสิทธิ์การใช้งาน</p>
+        </div>
+      </router-link>
+
+      <router-link to="/admin/reports" class="action-card group">
+        <div class="icon-box bg-rose-50 text-rose-600 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+          <FileBarChart class="w-6 h-6" />
+        </div>
+        <div class="text-left">
+          <h3 class="text-sm font-bold text-slate-800">รายงาน</h3>
+          <p class="text-[10px] text-slate-400 font-medium">สรุปยอดขายและข้อมูลสถิติต่างๆ</p>
+        </div>
+      </router-link>
+    </div>
+
     <!-- Recent Activity -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200">
       <div class="p-5 border-b border-slate-100 flex items-center justify-between">
@@ -71,7 +94,9 @@ import {
   Package, 
   CheckCircle, 
   ShoppingCart, 
-  Smartphone 
+  Smartphone,
+  Users,
+  FileBarChart
 } from 'lucide-vue-next';
 
 const authStore = useAuthStore();
@@ -114,5 +139,8 @@ onMounted(fetchStats);
 }
 .icon-box {
   @apply w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0;
+}
+.action-card {
+  @apply bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md flex items-center gap-4;
 }
 </style>

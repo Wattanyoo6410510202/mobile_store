@@ -13,14 +13,14 @@
 
         <form @submit.prevent="handleLogin" class="space-y-4">
           <div class="space-y-1.5">
-            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">อีเมลพนักงาน</label>
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">ชื่อผู้ใช้ หรือ อีเมล</label>
             <div class="relative group">
-              <Mail class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition" />
+              <User class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition" />
               <input 
                 v-model="email" 
-                type="email" 
+                type="text" 
                 class="gh-input pl-11"
-                placeholder="name@company.com"
+                placeholder="Username or email"
                 required
               />
             </div>
@@ -66,7 +66,7 @@
 import { ref } from 'vue';
 import { useAuthStore } from '../store/auth';
 import { useRouter } from 'vue-router';
-import { Smartphone, Mail, Lock, Loader2 } from 'lucide-vue-next';
+import { Smartphone, User, Lock, Loader2 } from 'lucide-vue-next';
 
 const email = ref('');
 const password = ref('');

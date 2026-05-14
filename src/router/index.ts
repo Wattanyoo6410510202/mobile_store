@@ -42,6 +42,11 @@ const routes = [
         name: 'Scanner',
         component: () => import('../views/products/Scanner.vue'),
       },
+      {
+        path: 'users',
+        name: 'UserManagement',
+        component: () => import('../views/products/UserList.vue'),
+      }
     ],
     meta: { requiresAuth: true },
   },

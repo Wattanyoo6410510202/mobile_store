@@ -66,8 +66,22 @@ const Product = sequelize.define('Product', {
   isMdmLocked: { type: DataTypes.BOOLEAN, defaultValue: false },
   isPromoAttached: { type: DataTypes.BOOLEAN, defaultValue: false },
   isGenuineParts: { type: DataTypes.BOOLEAN, defaultValue: true },
+  
+  // Hardware test fields
+  testTouchscreen: { type: DataTypes.BOOLEAN, defaultValue: true },
+  testSpeaker: { type: DataTypes.BOOLEAN, defaultValue: true },
+  testMic: { type: DataTypes.BOOLEAN, defaultValue: true },
+  testWifi: { type: DataTypes.BOOLEAN, defaultValue: true },
+  testBluetooth: { type: DataTypes.BOOLEAN, defaultValue: true },
+  testCamera: { type: DataTypes.BOOLEAN, defaultValue: true },
+  testFaceId: { type: DataTypes.BOOLEAN, defaultValue: true },
+  testFingerprint: { type: DataTypes.BOOLEAN, defaultValue: true },
+  testCharging: { type: DataTypes.BOOLEAN, defaultValue: true },
+  testSimCard: { type: DataTypes.BOOLEAN, defaultValue: true },
+
   conditionNote: { type: DataTypes.TEXT },
   thumbnail: { type: DataTypes.STRING },
+  vdo360: { type: DataTypes.STRING },
 }, {
   timestamps: true,
 });

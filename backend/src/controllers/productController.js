@@ -31,16 +31,51 @@ exports.getProduct = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
   try {
-    const productData = req.body;
+    const productData = { ...req.body };
     
-    if (req.files && req.files.thumbnail) {
-      productData.thumbnail = `/uploads/products/${req.files.thumbnail[0].filename}`;
+    // Parse boolean strings and handle empty strings for MySQL
+    const booleanFields = [
+      'hasWarranty', 'isCloudLocked', 'isResetReady', 'isMdmLocked', 
+      'isPromoAttached', 'isGenuineParts', 'testTouchscreen', 'testSpeaker',
+      'testMic', 'testWifi', 'testBluetooth', 'testCamera', 'testFaceId',
+      'testFingerprint', 'testCharging', 'testSimCard'
+    ];
+    
+    const numericFields = ['batteryHealth', 'purchasePrice', 'sellPrice'];
+    const dateFields = ['warrantyStartDate', 'saleDate', 'warrantyEndDate'];
+
+    Object.keys(productData).forEach(key => {
+      // Convert empty strings to null
+      if (productData[key] === '') {
+        productData[key] = null;
+      }
+      
+      // Handle booleans
+      if (booleanFields.includes(key)) {
+        if (productData[key] === 'true') productData[key] = true;
+        else if (productData[key] === 'false') productData[key] = false;
+        else if (productData[key] === null) delete productData[key]; // Use default
+      }
+
+      // Handle numbers
+      if (numericFields.includes(key) && productData[key] !== null) {
+        productData[key] = parseFloat(productData[key]);
+      }
+    });
+
+    if (req.files) {
+      if (req.files.thumbnail) {
+        productData.thumbnail = `/uploads/products/${req.files.thumbnail[0].filename}`;
+      }
+      if (req.files.vdo360) {
+        productData.vdo360 = `/uploads/products/${req.files.vdo360[0].filename}`;
+      }
     }
 
     const product = await Product.create(productData);
 
-    // Generate QR Code
-    const qrData = JSON.stringify({ id: product.id, model: product.model });
+    // Generate QR Code from IMEI 1 (or ID if IMEI1 is missing)
+    const qrData = productData.imei1 || product.id;
     const qrDir = path.join(__dirname, '../uploads/qrcodes');
     if (!fs.existsSync(qrDir)) fs.mkdirSync(qrDir, { recursive: true });
     const qrPath = path.join(qrDir, `${product.id}.png`);
@@ -49,12 +84,31 @@ exports.createProduct = async (req, res) => {
     product.barcode = `/uploads/qrcodes/${product.id}.png`;
     await product.save();
 
-    // Handle Images
-    if (req.files && req.files.images) {
-      const imagePromises = req.files.images.map(file => 
-        ProductImage.create({ productId: product.id, type: 'general', imageUrl: `/uploads/products/${file.filename}` })
-      );
-      await Promise.all(imagePromises);
+    // Handle Specific Image Categories (Including Thumbnail if it should be in gallery too)
+    const imageCategories = [
+      'thumbnail', 'front', 'back', 'left', 'right', 'bottomLeft', 'bottomRight',
+      'topEdge', 'bottomEdge', 'about1', 'about2', 'battery',
+      'rearCamera', 'frontCamera', 'screen', 'lens'
+    ];
+
+    if (req.files) {
+      for (const category of imageCategories) {
+        if (req.files[category]) {
+          await ProductImage.create({
+            productId: product.id,
+            type: category,
+            imageUrl: `/uploads/products/${req.files[category][0].filename}`
+          });
+        }
+      }
+
+      // Handle General Images
+      if (req.files.images) {
+        const imagePromises = req.files.images.map(file => 
+          ProductImage.create({ productId: product.id, type: 'general', imageUrl: `/uploads/products/${file.filename}` })
+        );
+        await Promise.all(imagePromises);
+      }
     }
 
     // Handle Seller
@@ -90,22 +144,86 @@ exports.updateProduct = async (req, res) => {
     const product = await Product.findByPk(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
 
-    const updateData = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const updateData = typeof req.body === 'string' ? JSON.parse(req.body) : { ...req.body };
+
+    // Parse boolean strings from FormData
+    const booleanFields = [
+      'hasWarranty', 'isCloudLocked', 'isResetReady', 'isMdmLocked', 
+      'isPromoAttached', 'isGenuineParts', 'testTouchscreen', 'testSpeaker',
+      'testMic', 'testWifi', 'testBluetooth', 'testCamera', 'testFaceId',
+      'testFingerprint', 'testCharging', 'testSimCard'
+    ];
+    
+    booleanFields.forEach(field => {
+      if (updateData[field] === 'true') updateData[field] = true;
+      if (updateData[field] === 'false') updateData[field] = false;
+    });
 
     if (req.files) {
       if (req.files.thumbnail) {
+        if (product.thumbnail) {
+          const oldPath = path.join(__dirname, '../', product.thumbnail);
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        }
         updateData.thumbnail = `/uploads/products/${req.files.thumbnail[0].filename}`;
       }
+      if (req.files.vdo360) {
+        if (product.vdo360) {
+          const oldPath = path.join(__dirname, '../', product.vdo360);
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        }
+        updateData.vdo360 = `/uploads/products/${req.files.vdo360[0].filename}`;
+      }
+    }
+
+    // Handle vdo360 deletion if explicitly set to null/empty in body
+    if (updateData.vdo360 === null || updateData.vdo360 === 'null') {
+      if (product.vdo360) {
+        const oldPath = path.join(__dirname, '../', product.vdo360);
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      }
+      updateData.vdo360 = null;
+    }
+
+    // Ensure status is valid if provided
+    if (updateData.status && !['available', 'sold', 'reserved', 'repair'].includes(updateData.status)) {
+      delete updateData.status;
     }
 
     await product.update(updateData);
 
-    // Handle New Images
-    if (req.files && req.files.images) {
-      const imagePromises = req.files.images.map(file => 
-        ProductImage.create({ productId: product.id, type: 'general', imageUrl: `/uploads/products/${file.filename}` })
-      );
-      await Promise.all(imagePromises);
+    // Handle Specific Image Categories
+    const imageCategories = [
+      'thumbnail', 'front', 'back', 'left', 'right', 'bottomLeft', 'bottomRight',
+      'topEdge', 'bottomEdge', 'about1', 'about2', 'battery',
+      'rearCamera', 'frontCamera', 'screen', 'lens'
+    ];
+
+    if (req.files) {
+      for (const category of imageCategories) {
+        if (req.files[category]) {
+          const existing = await ProductImage.findOne({ where: { productId: product.id, type: category } });
+          if (existing) {
+            const filePath = path.join(__dirname, '../', existing.imageUrl);
+            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            await existing.destroy();
+          }
+
+          await ProductImage.create({
+            productId: product.id,
+            type: category,
+            imageUrl: `/uploads/products/${req.files[category][0].filename}`
+          });
+        }
+      }
+
+      // Handle New General Images
+      if (req.files.images) {
+        const imagePromises = req.files.images.map(file => 
+          ProductImage.create({ productId: product.id, type: 'general', imageUrl: `/uploads/products/${file.filename}` })
+        );
+        await Promise.all(imagePromises);
+      }
     }
 
     // Handle Seller Update
@@ -169,6 +287,8 @@ exports.deleteProduct = async (req, res) => {
 
     // Delete thumbnail
     deleteFile(product.thumbnail);
+    // Delete VDO
+    deleteFile(product.vdo360);
     // Delete barcode
     deleteFile(product.barcode);
 

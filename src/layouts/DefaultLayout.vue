@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen bg-[var(--gh-canvas-subtle)] font-sans text-[var(--gh-fg-default)]">
     <!-- Main Content -->
     <main class="flex-1 flex flex-col overflow-hidden w-full bg-[var(--gh-canvas-subtle)]">
-      <header class="bg-white border-b sticky top-0 z-10" :style="{ borderColor: 'var(--gh-border-default)' }">
+      <header class="bg-white border-b sticky top-0 z-10 print-hide" :style="{ borderColor: 'var(--gh-border-default)' }">
         <!-- Top bar (GitHub-like) -->
         <div class="h-12 flex items-center justify-between px-2 sm:px-3 lg:px-6">
           <div class="flex items-center gap-2 min-w-0">
@@ -70,26 +70,29 @@
               <Search class="w-4 h-4" />
             </button>
 
-            <button class="inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
+            <router-link to="/admin" class="inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
               :style="{ borderColor: 'var(--gh-border-default)' }"
-              aria-label="Apps"
+              aria-label="Dashboard"
+              title="แดชบอร์ด"
             >
               <LayoutGrid class="w-4 h-4" />
-            </button>
+            </router-link>
 
-            <button class="inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
+            <router-link to="/admin/products/add" class="inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
               :style="{ borderColor: 'var(--gh-border-default)' }"
-              aria-label="New"
+              aria-label="New Product"
+              title="เพิ่มสินค้า"
             >
               <Plus class="w-4 h-4" />
-            </button>
+            </router-link>
 
-            <button class="hidden sm:inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
+            <router-link to="/admin/reports" class="inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
               :style="{ borderColor: 'var(--gh-border-default)' }"
-              aria-label="Issues"
+              aria-label="Reports"
+              title="รายงาน"
             >
               <CircleDot class="w-4 h-4" />
-            </button>
+            </router-link>
 
             <button class="hidden sm:inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
               :style="{ borderColor: 'var(--gh-border-default)' }"
@@ -105,12 +108,13 @@
               <Inbox class="w-4 h-4" />
             </button>
 
-            <button class="hidden sm:inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
+            <router-link to="/admin/users" class="hidden sm:inline-flex items-center justify-center h-8 w-8 rounded-md border bg-white hover:bg-slate-100 text-slate-700"
               :style="{ borderColor: 'var(--gh-border-default)' }"
-              aria-label="Profile"
+              aria-label="Users"
+              title="จัดการผู้ใช้"
             >
               <UserCircle2 class="w-4 h-4" />
-            </button>
+            </router-link>
           </div>
         </div>
 
@@ -152,6 +156,24 @@
             <span>สแกน</span>
           </router-link>
 
+          <router-link
+            to="/admin/users"
+            class="inline-flex items-center gap-2 text-sm font-semibold px-2 py-1 rounded-md hover:bg-slate-100 whitespace-nowrap flex-shrink-0"
+            :class="route.path.startsWith('/admin/users') ? 'text-slate-900' : 'text-slate-600'"
+          >
+            <Users class="w-4 h-4" />
+            <span>จัดการผู้ใช้</span>
+          </router-link>
+
+          <router-link
+            to="/admin/reports"
+            class="inline-flex items-center gap-2 text-sm font-semibold px-2 py-1 rounded-md hover:bg-slate-100 whitespace-nowrap flex-shrink-0"
+            :class="route.path.startsWith('/admin/reports') ? 'text-slate-900' : 'text-slate-600'"
+          >
+            <FileBarChart class="w-4 h-4" />
+            <span>รายงาน</span>
+          </router-link>
+
           <div class="ml-auto text-xs font-semibold text-slate-500 hidden md:block">
             {{ pageTitle }} • {{ currentDate }}
           </div>
@@ -187,6 +209,8 @@ import {
   UserCircle2,
   ChevronDown,
   QrCode,
+  Users,
+  FileBarChart
 } from 'lucide-vue-next';
 
 const authStore = useAuthStore();
