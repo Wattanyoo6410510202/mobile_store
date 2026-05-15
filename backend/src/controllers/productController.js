@@ -186,7 +186,7 @@ exports.updateProduct = async (req, res) => {
     }
 
     // Ensure status is valid if provided
-    if (updateData.status && !['available', 'sold', 'reserved', 'repair'].includes(updateData.status)) {
+    if (updateData.status && !['available', 'sold', 'reserved', 'repair', 'import'].includes(updateData.status)) {
       delete updateData.status;
     }
 

@@ -27,7 +27,7 @@
           </button>
           
           <div v-if="authStore.user" class="flex items-center space-x-3">
-            <span class="hidden sm:inline-block text-slate-900 truncate max-w-[100px] text-[10px]">{{ authStore.user.name }}</span>
+            <span class="hidden sm:inline-block text-slate-900 truncate max-w-[150px] text-[10px]">{{ authStore.user.email }}</span>
             <button @click="authStore.logout()" class="text-slate-400 hover:text-red-600 transition-colors">
               <LogOut class="w-4 h-4" />
             </button>
@@ -95,8 +95,10 @@
             class="group bg-white border border-slate-100 rounded-2xl p-6 flex flex-col items-center justify-center hover:border-blue-400 hover:shadow-lg transition-all duration-500 cursor-pointer h-36 hover-reveal"
             :class="(selectedBrand === brand.name || (selectedBrand === null && brand.name === 'ทั้งหมด')) ? 'border-blue-600 shadow-lg shadow-blue-100/50' : ''">
             <div class="h-12 flex items-center justify-center mb-5">
-              <component :is="brand.icon"
-                class="text-slate-900 scale-110 group-hover:scale-125 transition-transform duration-500" />
+              <img v-if="brand.imageUrl" :src="brand.imageUrl" :alt="brand.name"
+                class="w-10 h-10 object-contain scale-110 group-hover:scale-125 transition-transform duration-500 opacity-90 group-hover:opacity-100" />
+              <component v-else :is="brand.icon"
+                class="text-slate-900 scale-110 group-hover:scale-125 transition-transform duration-500 w-10 h-10" />
             </div>
             <span
               class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] group-hover:text-blue-600 transition-colors"
@@ -112,14 +114,31 @@
 
         <!-- Content on top of Video -->
         <div class="relative z-10 p-8 lg:p-10 bg-white/10 backdrop-blur-[1px]">
-          <div class="flex items-end justify-between mb-8">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
               <p class="text-[10px] font-[1000] text-blue-700 uppercase tracking-[0.3em] mb-1.5">MARKET WATCH</p>
               <h2 class="text-3xl font-bold text-slate-900 tracking-tight leading-none">Featured Deals</h2>
             </div>
-            <div class="flex items-center space-x-6">
+            <div class="flex items-center gap-3">
+              <!-- Search Box -->
+              <div class="relative group">
+                <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-blue-600 transition-colors pointer-events-none" />
+                <input
+                  v-model="searchQuery"
+                  type="text"
+                  placeholder="ค้นหาสินค้า..."
+                  class="pl-9 pr-4 py-2.5 text-[11px] font-semibold bg-slate-50 border border-slate-200 rounded-xl w-52 focus:outline-none focus:border-blue-400 focus:bg-white focus:shadow-md focus:shadow-blue-100/50 transition-all placeholder:text-slate-300"
+                />
+                <button
+                  v-if="searchQuery"
+                  @click="searchQuery = ''"
+                  class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-600 transition-colors"
+                >
+                  <X class="w-3 h-3" />
+                </button>
+              </div>
               <button v-if="selectedBrand" @click="selectedBrand = null"
-                class="text-[10px] font-black text-slate-300 hover:text-blue-600 transition-colors uppercase tracking-widest">
+                class="text-[10px] font-black text-slate-300 hover:text-blue-600 transition-colors uppercase tracking-widest whitespace-nowrap">
                 ล้างการเลือก
               </button>
             </div>
@@ -291,7 +310,7 @@
 <script setup>
 import { ref, computed, onMounted, defineComponent, h } from 'vue';
 import axios from 'axios';
-import { ShoppingBag, ArrowRight, MoreHorizontal, Check, Menu, LogOut } from 'lucide-vue-next';
+import { ShoppingBag, ArrowRight, MoreHorizontal, Check, Menu, LogOut, Search, X } from 'lucide-vue-next';
 import { useCartStore } from '../store/cart';
 import { useAuthStore } from '../store/auth';
 import CartModal from '../components/CartModal.vue';
@@ -305,6 +324,7 @@ const availableProducts = ref([]);
 const loading = ref(true);
 const selectedBrand = ref(null);
 const showAll = ref(false);
+const searchQuery = ref('');
 const router = useRouter();
 
 const addToCart = (product) => {
@@ -317,38 +337,12 @@ const addToCart = (product) => {
   }
 };
 
-// Pixel-perfect Brand Icons using CSS/Tailwind (Standard Scale)
-const AppleIcon = defineComponent({
-  render() { return h('div', { class: 'text-2xl font-[1000] font-serif italic tracking-tighter' }, 'iOS') }
-});
-const SamsungIcon = defineComponent({
-  render() {
-    return h('div', { class: 'w-10 h-10 border-[4px] border-slate-900 rounded-sm flex items-center justify-center p-1' },
-      [h('div', { class: 'border-[3px] border-slate-900 w-full h-full rounded-[1px]' })])
-  }
-});
-const GoogleIcon = defineComponent({
-  render() { return h('div', { class: 'text-xl font-[1000] tracking-[-0.15em]' }, 'GOOGLE') }
-});
-const OnePlusIcon = defineComponent({
-  render() {
-    return h('div', { class: 'w-10 h-10 flex flex-col items-center justify-center border-[4px] border-slate-900 rounded-sm' },
-      [h('div', { class: 'text-[14px] font-[1000] leading-none mb-0.5' }, '1'), h('div', { class: 'text-[10px] font-black leading-none' }, '+')])
-  }
-});
-const XiaomiIcon = defineComponent({
-  render() {
-    return h('div', { class: 'w-10 h-10 border-[4px] border-slate-900 rounded-lg flex items-center justify-center' },
-      [h('div', { class: 'w-6 h-6 bg-slate-900 rounded-[3px]' })])
-  }
-});
-
 const brandOptions = [
-  { name: 'Apple', icon: AppleIcon },
-  { name: 'Samsung', icon: SamsungIcon },
-  { name: 'Google', icon: GoogleIcon },
-  { name: 'OnePlus', icon: OnePlusIcon },
-  { name: 'Xiaomi', icon: XiaomiIcon },
+  { name: 'Apple', imageUrl: 'https://cdn.simpleicons.org/apple/0f172a' },
+  { name: 'Samsung', imageUrl: 'https://cdn.simpleicons.org/samsung/0f172a' },
+  { name: 'Google', imageUrl: 'https://cdn.simpleicons.org/google/0f172a' },
+  { name: 'OnePlus', imageUrl: 'https://cdn.simpleicons.org/oneplus/0f172a' },
+  { name: 'Xiaomi', imageUrl: 'https://cdn.simpleicons.org/xiaomi/0f172a' },
   { name: 'ทั้งหมด', icon: MoreHorizontal }
 ];
 
@@ -364,8 +358,20 @@ const fetchAvailableProducts = async () => {
 };
 
 const filteredProducts = computed(() => {
-  if (!selectedBrand.value) return availableProducts.value;
-  return availableProducts.value.filter(p => p.brand.toLowerCase() === selectedBrand.value.toLowerCase());
+  let result = availableProducts.value;
+  if (selectedBrand.value) {
+    result = result.filter(p => p.brand.toLowerCase() === selectedBrand.value.toLowerCase());
+  }
+  if (searchQuery.value.trim()) {
+    const q = searchQuery.value.trim().toLowerCase();
+    result = result.filter(p =>
+      (p.model && p.model.toLowerCase().includes(q)) ||
+      (p.brand && p.brand.toLowerCase().includes(q)) ||
+      (p.storage && p.storage.toLowerCase().includes(q)) ||
+      (p.color && p.color.toLowerCase().includes(q))
+    );
+  }
+  return result;
 });
 
 const displayedProducts = computed(() => {
@@ -429,10 +435,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
 .font-sans {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Tahoma', 'Sarabun', sans-serif;
 }
 
 @keyframes fade-in {

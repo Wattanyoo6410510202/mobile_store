@@ -31,6 +31,20 @@ exports.getAllReservations = async (req, res) => {
   }
 };
 
+exports.getMyReservations = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const reservations = await Reservation.findAll({
+      where: { user_id: userId },
+      include: [Product, Customer],
+      order: [['createdAt', 'DESC']]
+    });
+    res.json(reservations);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching my reservations', error: error.message });
+  }
+};
+
 exports.updateReservationStatus = async (req, res) => {
   try {
     const { id } = req.params;

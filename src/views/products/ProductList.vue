@@ -64,6 +64,7 @@
                   <option value="sold">ขายแล้ว</option>
                   <option value="reserved">จองแล้ว</option>
                   <option value="repair">ส่งซ่อม</option>
+                  <option value="import">รอนำเข้า</option>
                 </select>
               </td>
               <td class="px-6 py-4">
@@ -109,6 +110,7 @@
                     <option value="sold">ขายแล้ว</option>
                     <option value="reserved">จองแล้ว</option>
                     <option value="repair">ส่งซ่อม</option>
+                    <option value="import">รอนำเข้า</option>
                   </select>
                   <ChevronDown class="w-3.5 h-3.5 absolute right-3 pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity" />
                 </div>
@@ -273,7 +275,7 @@ const printWarranty = (product) => {
 };
 
 const translateStatus = (status) => {
-  const map = { available: 'พร้อมขาย', sold: 'ขายแล้ว', reserved: 'จองแล้ว', repair: 'ส่งซ่อม' };
+  const map = { available: 'พร้อมขาย', sold: 'ขายแล้ว', reserved: 'จองแล้ว', repair: 'ส่งซ่อม', import: 'รอนำเข้า' };
   return map[status] || status;
 };
 
@@ -282,7 +284,8 @@ const statusClass = (status) => {
     available: 'bg-emerald-50 text-emerald-600',
     sold: 'bg-slate-100 text-slate-500',
     reserved: 'bg-amber-50 text-amber-600',
-    repair: 'bg-red-50 text-red-600'
+    repair: 'bg-red-50 text-red-600',
+    import: 'bg-violet-50 text-violet-600'
   };
   return map[status] || 'bg-slate-100';
 };

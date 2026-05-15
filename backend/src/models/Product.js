@@ -48,7 +48,7 @@ const Product = sequelize.define('Product', {
     type: DataTypes.DATE,
   },
   status: {
-    type: DataTypes.ENUM('available', 'sold', 'reserved', 'repair'),
+    type: DataTypes.ENUM('available', 'sold', 'reserved', 'repair', 'import'),
     defaultValue: 'available',
   },
   condition: {
