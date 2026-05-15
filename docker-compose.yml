@@ -31,7 +31,7 @@ services:
     depends_on:
       - db
     ports:
-      - "5000:5000"
+      - "5001:5000"
     environment:
       - DB_HOST=db
       - DB_USER=root
@@ -57,7 +57,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "8080:80"
+      - "8082:80"
 
 volumes:
   db_data:
