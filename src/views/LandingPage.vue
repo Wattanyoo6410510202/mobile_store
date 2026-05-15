@@ -44,20 +44,12 @@
     <header class="relative pt-32 pb-24 overflow-hidden min-h-[600px] flex items-center bg-slate-900">
       <!-- Video Background Wrapper -->
       <div class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
-        <!-- 
-      1. ลบ / ข้างหน้า src ออกถ้าใส่ใน public แล้วยังไม่ขึ้น หรือลองเช็คชื่อไฟล์อีกรอบ
-      2. เพิ่ม object-fit: cover เพื่อให้วิดีโอเต็มจอ
-      3. ย้าย z-index มาอยู่ที่ wrapper
-    -->
         <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover" style="z-index: 0;">
           <source src="/landingpage.mp4" type="video/mp4">
         </video>
-
-        <!-- Overlay Layer: ปรับให้จางลง (0.4) เพื่อเช็คว่าวิดีโอมาไหม -->
         <div class="" style="z-index: 1;"></div>
       </div>
 
-      <!-- Content: มั่นใจว่าอยู่บนสุดด้วย z-10 -->
       <div class="max-w-7xl mx-auto px-6 text-center relative" style="z-index: 10;">
         <span
           class="inline-block px-3 py-1 bg-blue-50/90 text-blue-600 text-[9px] font-black uppercase tracking-[0.4em] rounded-full mb-6 backdrop-blur-md">
@@ -73,12 +65,6 @@
           ยกระดับสมาร์ทโฟนมือสองสู่มาตรฐานใหม่ <br />
           ทุกเครื่องคือความสมบูรณ์แบบที่ผ่านการคัดสรรโดยผู้เชี่ยวชาญ
         </p>
-        <!-- <div class="flex items-center justify-center gap-4 animate-fade-in-up delay-200">
-          <a href="#deals"
-            class="px-10 py-4 bg-black text-white font-[1000] text-[10px] uppercase tracking-[0.2em] rounded-xl hover:bg-blue-600 transition-all active:scale-95 shadow-xl shadow-slate-100">เริ่มเลือกซื้อ</a>
-          <a href="#quality"
-            class="px-10 py-4 border border-slate-200 text-white font-[1000] text-[10px] uppercase tracking-[0.2em] rounded-xl hover:bg-slate-50 transition-all">มาตรฐานของเรา</a>
-        </div> -->
       </div>
     </header>
 
@@ -95,7 +81,7 @@
             class="group bg-white border border-slate-100 rounded-2xl p-6 flex flex-col items-center justify-center hover:border-blue-400 hover:shadow-lg transition-all duration-500 cursor-pointer h-36 hover-reveal"
             :class="(selectedBrand === brand.name || (selectedBrand === null && brand.name === 'ทั้งหมด')) ? 'border-blue-600 shadow-lg shadow-blue-100/50' : ''">
             <div class="h-12 flex items-center justify-center mb-5">
-              <img v-if="brand.imageUrl" :src="brand.imageUrl" :alt="brand.name"
+              <img v-if="brand.imageUrl" :src="brand.imageUrl" :alt="brand.name" loading="lazy"
                 class="w-10 h-10 object-contain scale-110 group-hover:scale-125 transition-transform duration-500 opacity-90 group-hover:opacity-100" />
               <component v-else :is="brand.icon"
                 class="text-slate-900 scale-110 group-hover:scale-125 transition-transform duration-500 w-10 h-10" />
@@ -108,11 +94,8 @@
         </div>
       </section>
 
-      <!-- Featured Deals Section (With Fixed Video BG) -->
+      <!-- Featured Deals Section -->
       <section id="deals" class="section-animate" v-intersection>
-        <!-- YouTube Background Layer (Increased visibility) -->
-
-        <!-- Content on top of Video -->
         <div class="relative z-10 p-8 lg:p-10 bg-white/10 backdrop-blur-[1px]">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
@@ -120,7 +103,6 @@
               <h2 class="text-3xl font-bold text-slate-900 tracking-tight leading-none">Featured Deals</h2>
             </div>
             <div class="flex items-center gap-3">
-              <!-- Search Box -->
               <div class="relative group">
                 <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-blue-600 transition-colors pointer-events-none" />
                 <input
@@ -145,8 +127,7 @@
           </div>
 
           <div v-if="loading" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div v-for="i in 4" :key="i"
-              class="aspect-[3/4] bg-white/40 animate-pulse rounded-lg border border-slate-100"></div>
+            <Skeleton v-for="i in 8" :key="i" class="aspect-[3/4] w-full" />
           </div>
 
           <div v-else-if="filteredProducts.length === 0"
@@ -158,15 +139,12 @@
           <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div v-for="product in displayedProducts" :key="product.id"
               class="group bg-white/90 border border-slate-100 rounded-lg p-4 hover:shadow-xl hover:bg-white transition-all duration-500 hover-reveal">
-              <!-- Product Image Area (No Gray BG) -->
               <div class="relative aspect-square rounded-md overflow-hidden mb-6 flex items-center justify-center">
-                <img v-if="product.thumbnail" :src="assetUrl(product.thumbnail)"
+                <img v-if="product.thumbnail" :src="assetUrl(product.thumbnail)" loading="lazy"
                   class="w-full h-full object-contain p-2 transition-transform duration-700 group-hover:scale-110" />
                 <div v-else class="w-full h-full flex items-center justify-center">
                   <Smartphone class="w-12 h-12 text-slate-200" />
                 </div>
-
-                <!-- Hot/Sale Tag -->
                 <div class="absolute top-2 left-2">
                   <span v-if="product.condition === 'new'"
                     class="bg-[#2563EB] text-white text-[8px] font-black px-2 py-0.5 rounded-sm uppercase tracking-wider shadow-sm">HOT</span>
@@ -176,9 +154,7 @@
                 </div>
               </div>
 
-              <!-- Product Info -->
               <div class="relative">
-                <!-- Condition Badge -->
                 <div class="absolute top-0 right-0">
                   <span :class="getConditionClass(product.batteryHealth)"
                     class="text-[8px] font-[1000] px-1.5 py-0.5 rounded-sm border uppercase tracking-wider bg-white">
@@ -206,7 +182,6 @@
             </div>
           </div>
 
-          <!-- Show More / Show Less Button -->
           <div v-if="filteredProducts.length > 8" class="mt-16 text-center">
             <button @click="showAll = !showAll"
               class="px-12 py-3.5 border-2 border-slate-900 text-slate-900 font-black text-[10px] uppercase tracking-[0.3em] rounded-xl hover:bg-black hover:text-white backdrop-blur-md transition-all active:scale-95 shadow-xl shadow-slate-100">
@@ -215,6 +190,8 @@
           </div>
         </div>
       </section>
+
+      <!-- ... (Rest of content) -->
 
       <!-- Quality Assurance Section (Compact) -->
       <section id="quality" class="section-animate" v-intersection>
@@ -314,6 +291,7 @@ import { ShoppingBag, ArrowRight, MoreHorizontal, Check, Menu, LogOut, Search, X
 import { useCartStore } from '../store/cart';
 import { useAuthStore } from '../store/auth';
 import CartModal from '../components/CartModal.vue';
+import Skeleton from '../components/Skeleton.vue';
 import { useRouter } from 'vue-router';
 import { getApiBasePath, assetUrl } from '../config/api';
 import { useToast } from 'vue-toastification';

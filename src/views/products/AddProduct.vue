@@ -213,14 +213,24 @@
           <div class="mt-6">
             <label class="text-xs font-bold text-slate-500 mb-2 block uppercase tracking-wider">วิดีโอ 360 องศา (VDO 360)</label>
             <div class="relative bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 text-center hover:border-blue-400 transition-colors">
-              <template v-if="form.vdo360">
-                <p class="text-[10px] text-emerald-600 font-medium">เลือกไฟล์วิดีโอแล้ว: {{ form.vdo360.name }}</p>
-                <button @click.prevent="form.vdo360 = null" class="text-[10px] text-red-500 underline mt-1">เปลี่ยนไฟล์</button>
-              </template>
-              <template v-else-if="existingVdo360">
-                <p class="text-[10px] text-blue-600 font-medium">มีวิดีโอเดิมอยู่แล้ว</p>
-                <button @click.prevent="deleteVdo360" class="text-[10px] text-red-500 underline mt-1">ลบวิดีโอเดิม</button>
-              </template>
+    <template v-if="form.vdo360">
+      <div class="relative group">
+        <video :src="resolveUrl(form.vdo360)" class="w-full max-h-48 rounded-lg bg-black" controls playsinline></video>
+        <button @click.prevent="deleteVdo360" class="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition">
+          <Trash2 class="w-3.5 h-3.5" />
+        </button>
+      </div>
+      <p class="text-[10px] text-emerald-600 font-medium mt-2">{{ form.vdo360.name }}</p>
+    </template>
+    <template v-else-if="existingVdo360">
+      <div class="relative group">
+        <video :src="resolveUrl(existingVdo360)" class="w-full max-h-48 rounded-lg bg-black" controls playsinline></video>
+        <button @click.prevent="deleteVdo360" class="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition">
+          <Trash2 class="w-3.5 h-3.5" />
+        </button>
+      </div>
+      <p class="text-[10px] text-blue-600 font-medium mt-2">มีวิดีโอเดิมอยู่แล้ว</p>
+    </template>
               <template v-else>
                 <Camera class="w-6 h-6 mx-auto text-slate-400 mb-2" />
                 <p class="text-[10px] text-slate-500">อัปโหลดวิดีโอแสดงสภาพเครื่องรอบด้าน</p>
@@ -291,14 +301,14 @@
                 <div class="aspect-video bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center p-2 text-center hover:border-indigo-400 transition-colors relative overflow-hidden">
                   <template v-if="getImageForCategory('idCard')">
                     <img :src="getImageForCategory('idCard')" @click="previewUrl = getImageForCategory('idCard')" class="absolute inset-0 w-full h-full object-cover cursor-pointer">
-                    <button @click.prevent="deleteCategoryImage('idCard')" class="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition">
+                    <button @click.prevent="deleteSellerImage('idCard')" class="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition">
                       <X class="w-3 h-3" />
                     </button>
                   </template>
                   <template v-else>
                     <Camera class="w-5 h-5 text-slate-400 mb-1" />
                     <span class="text-[9px] font-bold text-slate-500">รูปบัตรประชาชน</span>
-                    <input type="file" @change="e => handleCategoryFile(e, 'idCard')" class="absolute inset-0 opacity-0 cursor-pointer">
+                    <input type="file" @change="e => { handleCategoryFile(e, 'idCard'); deletedSellerImages.idCardImage = false; }" class="absolute inset-0 opacity-0 cursor-pointer">
                   </template>
                 </div>
                 <p v-if="form.idCard" class="text-[8px] text-emerald-600 mt-1 truncate">{{ form.idCard.name }}</p>
@@ -309,14 +319,14 @@
                 <div class="aspect-video bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center p-2 text-center hover:border-indigo-400 transition-colors relative overflow-hidden">
                   <template v-if="getImageForCategory('sellerWithPhone')">
                     <img :src="getImageForCategory('sellerWithPhone')" @click="previewUrl = getImageForCategory('sellerWithPhone')" class="absolute inset-0 w-full h-full object-cover cursor-pointer">
-                    <button @click.prevent="deleteCategoryImage('sellerWithPhone')" class="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition">
+                    <button @click.prevent="deleteSellerImage('sellerWithPhone')" class="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition">
                       <X class="w-3 h-3" />
                     </button>
                   </template>
                   <template v-else>
                     <Camera class="w-5 h-5 text-slate-400 mb-1" />
                     <span class="text-[9px] font-bold text-slate-500">รูปคู่กับเครื่อง</span>
-                    <input type="file" @change="e => handleCategoryFile(e, 'sellerWithPhone')" class="absolute inset-0 opacity-0 cursor-pointer">
+                    <input type="file" @change="e => { handleCategoryFile(e, 'sellerWithPhone'); deletedSellerImages.sellerWithPhoneImage = false; }" class="absolute inset-0 opacity-0 cursor-pointer">
                   </template>
                 </div>
                 <p v-if="form.sellerWithPhone" class="text-[8px] text-emerald-600 mt-1 truncate">{{ form.sellerWithPhone.name }}</p>
@@ -328,14 +338,14 @@
               <div class="aspect-[3/1] bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center p-2 text-center hover:border-indigo-400 transition-colors relative overflow-hidden">
                 <template v-if="getImageForCategory('signature')">
                   <img :src="getImageForCategory('signature')" @click="previewUrl = getImageForCategory('signature')" class="absolute inset-0 w-full h-full object-contain cursor-pointer">
-                  <button @click.prevent="deleteCategoryImage('signature')" class="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition">
+                  <button @click.prevent="deleteSellerImage('signature')" class="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition">
                     <X class="w-3 h-3" />
                   </button>
                 </template>
                 <template v-else>
                   <PenTool class="w-5 h-5 text-slate-400 mb-1" />
                   <span class="text-[9px] font-bold text-slate-500">อัปโหลดรูปลายเซ็น (Signature)</span>
-                  <input type="file" @change="e => handleCategoryFile(e, 'signature')" class="absolute inset-0 opacity-0 cursor-pointer">
+                  <input type="file" @change="e => { handleCategoryFile(e, 'signature'); deletedSellerImages.signature = false; }" class="absolute inset-0 opacity-0 cursor-pointer">
                 </template>
               </div>
               <p v-if="form.signature" class="text-[8px] text-emerald-600 mt-1 truncate">{{ form.signature.name }}</p>
@@ -546,7 +556,8 @@ import { useAuthStore } from '../../store/auth';
 import { useRouter, useRoute } from 'vue-router';
 import { 
   ArrowLeft, ArrowRight, Smartphone, Camera, X, ClipboardCheck, 
-  UserCheck, CheckCircle2, AlertTriangle, PenTool, FileText, Check
+  UserCheck, CheckCircle2, AlertTriangle, PenTool, FileText, Check,
+  Trash2
 } from 'lucide-vue-next';
 import { getApiBasePath, assetUrl } from '../../config/api';
 import { useToast } from 'vue-toastification';
@@ -570,6 +581,12 @@ const existingSellerImages = reactive({
   idCardImageUrl: null,
   sellerWithPhoneImageUrl: null,
   signatureUrl: null
+});
+
+const deletedSellerImages = reactive({
+  idCardImage: false,
+  sellerWithPhoneImage: false,
+  signature: false
 });
 
 const stepTitles = [
@@ -670,8 +687,12 @@ const getImageForCategory = (category) => {
     const existing = existingImages.value.find(img => img.type === category);
     if (existing && existing.imageUrl) return resolveUrl(existing.imageUrl);
   }
-  // Fallback for thumbnail if it's not in existingImages but in existingThumbnail
+  // Fallback for thumbnail
   if (category === 'thumbnail' && existingThumbnail.value) return resolveUrl(existingThumbnail.value);
+  // Fallback for seller images
+  if (category === 'idCard' && existingSellerImages.idCardImageUrl) return resolveUrl(existingSellerImages.idCardImageUrl);
+  if (category === 'sellerWithPhone' && existingSellerImages.sellerWithPhoneImageUrl) return resolveUrl(existingSellerImages.sellerWithPhoneImageUrl);
+  if (category === 'signature' && existingSellerImages.signatureUrl) return resolveUrl(existingSellerImages.signatureUrl);
   return null;
 };
 
@@ -712,14 +733,31 @@ const deleteCategoryImage = async (category) => {
   }
 };
 
+const deleteSellerImage = (type) => {
+  if (!confirm(`ยืนยันการลบรูป${type === 'idCard' ? 'บัตรประชาชน' : type === 'sellerWithPhone' ? 'คู่กับเครื่อง' : 'ลายเซ็น'}?`)) return;
+  if (type === 'idCard') {
+    existingSellerImages.idCardImageUrl = null;
+    deletedSellerImages.idCardImage = true;
+  } else if (type === 'sellerWithPhone') {
+    existingSellerImages.sellerWithPhoneImageUrl = null;
+    deletedSellerImages.sellerWithPhoneImage = true;
+  } else if (type === 'signature') {
+    existingSellerImages.signatureUrl = null;
+    deletedSellerImages.signature = true;
+  }
+  toast.success('ลบรูปภาพสำเร็จ');
+};
+
 const deleteVdo360 = async () => {
   if (!confirm('ยืนยันการลบวิดีโอ 360?')) return;
   try {
     const id = route.params.id;
-    await axios.put(`${getApiBasePath()}/products/${id}`, { vdo360: null }, {
+    await axios.delete(`${getApiBasePath()}/products/vdo/${id}`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
+    // Reset ทั้ง form และ logic เพื่อให้ UI อัปเดต
     form.vdo360 = null;
+    // เพิ่มการอัปเดต state ถ้าจำเป็น
     toast.success('ลบวิดีโอสำเร็จ');
   } catch (error) {
     console.error('Delete VDO failed:', error);
@@ -817,6 +855,11 @@ const handleSubmit = async () => {
     files.value.forEach(file => {
       formData.append('images', file);
     });
+    
+    // Add seller image deletion flags
+    if (deletedSellerImages.idCardImage) formData.append('deleteIdCardImage', 'true');
+    if (deletedSellerImages.sellerWithPhoneImage) formData.append('deleteSellerWithPhoneImage', 'true');
+    if (deletedSellerImages.signature) formData.append('deleteSignatureImage', 'true');
     
     const url = isEdit.value 
       ? `${getApiBasePath()}/products/${route.params.id}`

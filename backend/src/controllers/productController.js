@@ -20,19 +20,21 @@ exports.getStats = async (req, res) => {
     const total = await Product.count();
     const available = await Product.count({ where: { status: 'available' } });
     const sold = await Product.count({ where: { status: 'sold' } });
-    
+    const reserved = await Product.count({ where: { status: 'reserved' } });
+    const repair = await Product.count({ where: { status: 'repair' } });
+    const importStatus = await Product.count({ where: { status: 'import' } });
+
     const recent = await Product.findAll({
       limit: 5,
       order: [['updatedAt', 'DESC']],
       attributes: ['id', 'brand', 'model', 'status', 'updatedAt']
     });
 
-    res.json({ total, available, sold, recent });
+    res.json({ total, available, sold, reserved, repair, import: importStatus, recent });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching stats', error: error.message });
   }
 };
-
 exports.getProduct = async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id, {
@@ -203,6 +205,15 @@ exports.updateProduct = async (req, res) => {
       updateData.vdo360 = null;
     }
 
+    // Handle thumbnail deletion if explicitly set to null/empty in body
+    if (updateData.thumbnail === null || updateData.thumbnail === 'null') {
+      if (product.thumbnail) {
+        const oldPath = path.join(__dirname, '../', product.thumbnail);
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      }
+      updateData.thumbnail = null;
+    }
+
     // Ensure status is valid if provided
     if (updateData.status && !['available', 'sold', 'reserved', 'repair', 'import'].includes(updateData.status)) {
       delete updateData.status;
@@ -245,19 +256,70 @@ exports.updateProduct = async (req, res) => {
     }
 
     // Handle Seller Update
-    if (updateData.sellerFullName) {
+    if (updateData.sellerFullName || req.files?.idCardImage || req.files?.sellerWithPhoneImage || req.files?.signature) {
       const SellerInfo = require('../models/SellerInfo');
       let seller = await SellerInfo.findOne({ where: { productId: product.id } });
+
+      // Prepare existing data if seller exists
       const sellerData = {
-        fullName: updateData.sellerFullName,
-        phoneNumber: updateData.sellerPhone,
-        idCardNumber: updateData.sellerIdCardNumber,
+        fullName: updateData.sellerFullName || (seller ? seller.fullName : null),
+        phoneNumber: updateData.sellerPhone || (seller ? seller.phoneNumber : null),
+        idCardNumber: updateData.sellerIdCardNumber || (seller ? seller.idCardNumber : null),
       };
 
+      // Keep existing image URLs unless replaced or deleted
+      if (seller) {
+        sellerData.idCardImageUrl = seller.idCardImageUrl;
+        sellerData.sellerWithPhoneImageUrl = seller.sellerWithPhoneImageUrl;
+        sellerData.signatureUrl = seller.signatureUrl;
+      }
+
       if (req.files) {
-        if (req.files.idCardImage) sellerData.idCardImageUrl = `/uploads/products/${req.files.idCardImage[0].filename}`;
-        if (req.files.sellerWithPhoneImage) sellerData.sellerWithPhoneImageUrl = `/uploads/products/${req.files.sellerWithPhoneImage[0].filename}`;
-        if (req.files.signature) sellerData.signatureUrl = `/uploads/products/${req.files.signature[0].filename}`;
+        // Delete old files when new ones are uploaded
+        if (req.files.idCardImage) {
+          if (seller && seller.idCardImageUrl) {
+            const oldPath = path.join(__dirname, '../', seller.idCardImageUrl);
+            if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+          }
+          sellerData.idCardImageUrl = `/uploads/products/${req.files.idCardImage[0].filename}`;
+        }
+        if (req.files.sellerWithPhoneImage) {
+          if (seller && seller.sellerWithPhoneImageUrl) {
+            const oldPath = path.join(__dirname, '../', seller.sellerWithPhoneImageUrl);
+            if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+          }
+          sellerData.sellerWithPhoneImageUrl = `/uploads/products/${req.files.sellerWithPhoneImage[0].filename}`;
+        }
+        if (req.files.signature) {
+          if (seller && seller.signatureUrl) {
+            const oldPath = path.join(__dirname, '../', seller.signatureUrl);
+            if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+          }
+          sellerData.signatureUrl = `/uploads/products/${req.files.signature[0].filename}`;
+        }
+      }
+
+      // Handle seller image deletion if explicitly set to 'null'
+      if (updateData.deleteIdCardImage === 'true' || updateData.deleteIdCardImage === true) {
+        if (seller && seller.idCardImageUrl) {
+          const oldPath = path.join(__dirname, '../', seller.idCardImageUrl);
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        }
+        sellerData.idCardImageUrl = null;
+      }
+      if (updateData.deleteSellerWithPhoneImage === 'true' || updateData.deleteSellerWithPhoneImage === true) {
+        if (seller && seller.sellerWithPhoneImageUrl) {
+          const oldPath = path.join(__dirname, '../', seller.sellerWithPhoneImageUrl);
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        }
+        sellerData.sellerWithPhoneImageUrl = null;
+      }
+      if (updateData.deleteSignatureImage === 'true' || updateData.deleteSignatureImage === true) {
+        if (seller && seller.signatureUrl) {
+          const oldPath = path.join(__dirname, '../', seller.signatureUrl);
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        }
+        sellerData.signatureUrl = null;
       }
 
       if (seller) await seller.update(sellerData);
@@ -283,6 +345,25 @@ exports.deleteProductImage = async (req, res) => {
     res.json({ message: 'Image deleted' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting image', error: error.message });
+  }
+};
+
+exports.deleteProductVdo = async (req, res) => {
+  try {
+    const product = await Product.findByPk(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    if (product.vdo360) {
+      const filePath = path.join(__dirname, '../', product.vdo360);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      
+      product.vdo360 = null;
+      await product.save();
+    }
+
+    res.json({ message: 'VDO deleted' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting VDO', error: error.message });
   }
 };
 

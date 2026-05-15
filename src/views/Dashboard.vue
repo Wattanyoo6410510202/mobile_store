@@ -10,40 +10,64 @@
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6">
       <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">สินค้าทั้งหมด</h3>
-            <p class="text-2xl font-bold text-slate-800 mt-1">{{ stats.total }}</p>
-          </div>
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-blue-50 text-blue-600">
+        <div class="flex flex-col items-center justify-center text-center">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-50 text-blue-600 mb-3">
             <Package class="w-5 h-5" />
           </div>
+          <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">ทั้งหมด</h3>
+          <p class="text-2xl font-bold text-slate-800 mt-1">{{ stats.total }}</p>
         </div>
       </div>
 
       <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">พร้อมขาย</h3>
-            <p class="text-2xl font-bold text-emerald-600 mt-1">{{ stats.available }}</p>
-          </div>
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-emerald-50 text-emerald-600">
+        <div class="flex flex-col items-center justify-center text-center">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-50 text-emerald-600 mb-3">
             <CheckCircle class="w-5 h-5" />
           </div>
+          <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">พร้อมขาย</h3>
+          <p class="text-2xl font-bold text-emerald-600 mt-1">{{ stats.available }}</p>
         </div>
       </div>
 
       <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">ขายแล้วเดือนนี้</h3>
-            <p class="text-2xl font-bold text-amber-600 mt-1">{{ stats.sold }}</p>
-          </div>
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-amber-50 text-amber-600">
+        <div class="flex flex-col items-center justify-center text-center">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-50 text-amber-600 mb-3">
             <ShoppingCart class="w-5 h-5" />
           </div>
+          <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">ขายแล้ว</h3>
+          <p class="text-2xl font-bold text-amber-600 mt-1">{{ stats.sold }}</p>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md">
+        <div class="flex flex-col items-center justify-center text-center">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-orange-50 text-orange-500 mb-3">
+            <Package class="w-5 h-5" />
+          </div>
+          <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">จองแล้ว</h3>
+          <p class="text-2xl font-bold text-orange-500 mt-1">{{ stats.reserved }}</p>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md">
+        <div class="flex flex-col items-center justify-center text-center">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-red-50 text-red-500 mb-3">
+            <Package class="w-5 h-5" />
+          </div>
+          <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">ส่งซ่อม</h3>
+          <p class="text-2xl font-bold text-red-500 mt-1">{{ stats.repair }}</p>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md">
+        <div class="flex flex-col items-center justify-center text-center">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-purple-50 text-purple-600 mb-3">
+            <Package class="w-5 h-5" />
+          </div>
+          <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">รอนำเข้า</h3>
+          <p class="text-2xl font-bold text-purple-600 mt-1">{{ stats.import }}</p>
         </div>
       </div>
     </div>
@@ -127,6 +151,9 @@ const stats = reactive({
   total: 0,
   available: 0,
   sold: 0,
+  reserved: 0,
+  repair: 0,
+  import: 0,
   recent: []
 });
 
@@ -146,6 +173,9 @@ const fetchStats = async () => {
     stats.total = response.data.total;
     stats.available = response.data.available;
     stats.sold = response.data.sold;
+    stats.reserved = response.data.reserved;
+    stats.repair = response.data.repair;
+    stats.import = response.data.import;
     stats.recent = response.data.recent || [];
   } catch (error) {
     console.error('Failed to fetch dashboard stats', error);
@@ -154,5 +184,3 @@ const fetchStats = async () => {
 
 onMounted(fetchStats);
 </script>
-
-

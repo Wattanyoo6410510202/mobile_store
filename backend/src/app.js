@@ -44,6 +44,7 @@ app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/cart', require('./routes/cartRoutes'));
 app.use('/api/checkout', require('./routes/checkoutRoutes'));
 app.use('/api/reservations', require('./routes/reservationRoutes'));
+app.use('/api/reports', require('./routes/reportRoutes'));
 app.get('/api/settings', async (req, res) => {
     const settings = await Settings.findByPk(1) || await Settings.create({});
     res.json(settings);

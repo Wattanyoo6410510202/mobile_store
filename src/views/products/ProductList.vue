@@ -40,71 +40,31 @@
             </tr>
           </thead>
           <tbody class="divide-y" :style="{ borderColor: 'var(--gh-border-muted)' }">
-            <tr v-for="product in sortedProducts" :key="product.id" class="hover:bg-[var(--gh-canvas-subtle)] transition">
-              <td class="px-6 py-4">
-                <img v-if="product.thumbnail" :src="assetUrl(product.thumbnail)" class="w-12 h-12 object-cover rounded-lg border" />
-                <div v-else class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
-                  <Smartphone class="w-6 h-6" />
-                </div>
-              </td>
-              <td class="px-6 py-4 font-medium text-slate-800">{{ product.brand }}</td>
-              <td class="px-6 py-4">{{ product.model }}</td>
-              <td class="px-6 py-4">{{ product.imei1 }}</td>
-              <td class="px-6 py-4 text-xs">{{ formatDate(product.createdAt) }}</td>
-              <td class="px-6 py-4 text-xs">{{ formatDate(product.warrantyEndDate) }}</td>
-              <td class="px-6 py-4 font-bold text-slate-800">฿{{ Number(product.sellPrice).toLocaleString() }}</td>
-              <td class="px-6 py-4">
-                <select 
-                  :value="product.status" 
-                  @change="e => updateStatus(product.id, e.target.value)"
-                  :class="statusClass(product.status)"
-                  class="gh-input !py-1 !px-2 !text-[10px] font-[1000] uppercase rounded-full border-none cursor-pointer focus:ring-1 focus:ring-blue-400 appearance-none text-center"
-                >
-                  <option value="available">พร้อมขาย</option>
-                  <option value="sold">ขายแล้ว</option>
-                  <option value="reserved">จองแล้ว</option>
-                  <option value="repair">ส่งซ่อม</option>
-                  <option value="import">รอนำเข้า</option>
-                </select>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex space-x-2">
-                    <button @click="printWarranty(product)" class="p-2 text-slate-400 hover:text-emerald-600 transition" title="พิมพ์ใบประกัน"><FileText class="w-4 h-4" /></button>
-                    <button @click="editProduct(product.id)" class="p-2 text-slate-400 hover:text-blue-600 transition" title="แก้ไข"><Edit3 class="w-4 h-4" /></button>
-                    <button @click="deleteProduct(product.id)" class="p-2 text-slate-400 hover:text-red-600 transition" title="ลบ"><Trash2 class="w-4 h-4" /></button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Card View -->
-      <div v-else class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <div v-for="product in sortedProducts" :key="product.id" class="group bg-white rounded-2xl p-5 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.12)] transition-all duration-300 flex flex-col gap-4">
-              <div class="flex items-start gap-4">
-                  <div class="relative">
-                    <img v-if="product.thumbnail" :src="assetUrl(product.thumbnail)" class="w-20 h-20 object-cover rounded-xl border border-slate-100" />
-                    <div v-else class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300 border border-slate-100">
-                        <Smartphone class="w-8 h-8" />
-                    </div>
+            <template v-if="isLoading">
+              <tr v-for="n in 5" :key="n">
+                <td colspan="9" class="p-2"><Skeleton /></td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr v-for="product in sortedProducts" :key="product.id" class="hover:bg-[var(--gh-canvas-subtle)] transition">
+                <td class="px-6 py-4">
+                  <img v-if="product.thumbnail" :src="assetUrl(product.thumbnail)" loading="lazy" class="w-12 h-12 object-cover rounded-lg border" />
+                  <div v-else class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
+                    <Smartphone class="w-6 h-6" />
                   </div>
-                  <div class="flex-1 min-w-0">
-                      <p class="font-bold text-slate-900 truncate">{{ product.brand }}</p>
-                      <p class="text-sm text-slate-600 truncate">{{ product.model }}</p>
-                      <p class="text-[11px] text-slate-400 font-mono mt-1 bg-slate-50 inline-block px-1.5 py-0.5 rounded">IMEI: {{ product.imei1 }}</p>
-                      <p class="text-[10px] text-slate-400 mt-1.5">เพิ่มเมื่อ: {{ formatDate(product.createdAt) }}</p>
-                  </div>
-              </div>
-              
-              <div class="flex items-center justify-between border-t border-slate-50 pt-4">
-                <p class="text-xl font-black text-slate-900 tracking-tight">฿{{ Number(product.sellPrice).toLocaleString() }}</p>
-                <div class="relative flex items-center group">
+                </td>
+                <td class="px-6 py-4 font-medium text-slate-800">{{ product.brand }}</td>
+                <td class="px-6 py-4">{{ product.model }}</td>
+                <td class="px-6 py-4">{{ product.imei1 }}</td>
+                <td class="px-6 py-4 text-xs">{{ formatDate(product.createdAt) }}</td>
+                <td class="px-6 py-4 text-xs">{{ formatDate(product.warrantyEndDate) }}</td>
+                <td class="px-6 py-4 font-bold text-slate-800">฿{{ Number(product.sellPrice).toLocaleString() }}</td>
+                <td class="px-6 py-4">
                   <select 
                     :value="product.status" 
                     @change="e => updateStatus(product.id, e.target.value)"
                     :class="statusClass(product.status)"
-                    class="appearance-none pl-4 pr-9 py-2 text-[10px] font-black uppercase rounded-2xl border-none cursor-pointer focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm group-hover:shadow-md"
+                    class="gh-input !py-1 !px-2 !text-[10px] font-[1000] uppercase rounded-full border-none cursor-pointer focus:ring-1 focus:ring-blue-400 appearance-none text-center"
                   >
                     <option value="available">พร้อมขาย</option>
                     <option value="sold">ขายแล้ว</option>
@@ -112,18 +72,70 @@
                     <option value="repair">ส่งซ่อม</option>
                     <option value="import">รอนำเข้า</option>
                   </select>
-                  <ChevronDown class="w-3.5 h-3.5 absolute right-3 pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity" />
-                </div>
-              </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex space-x-2">
+                      <button @click="printWarranty(product)" class="p-2 text-slate-400 hover:text-emerald-600 transition" title="พิมพ์ใบประกัน"><FileText class="w-4 h-4" /></button>
+                      <button @click="editProduct(product.id)" class="p-2 text-slate-400 hover:text-blue-600 transition" title="แก้ไข"><Edit3 class="w-4 h-4" /></button>
+                      <button @click="deleteProduct(product.id)" class="p-2 text-slate-400 hover:text-red-600 transition" title="ลบ"><Trash2 class="w-4 h-4" /></button>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
 
-              <div class="flex items-center justify-end border-t border-slate-50 pt-3 mt-auto">
-                <div class="flex space-x-1">
-                    <button @click="printWarranty(product)" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="พิมพ์ใบประกัน"><FileText class="w-4 h-4" /></button>
-                    <button @click="editProduct(product.id)" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="แก้ไข"><Edit3 class="w-4 h-4" /></button>
-                    <button @click="deleteProduct(product.id)" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="ลบ"><Trash2 class="w-4 h-4" /></button>
+      <!-- Card View -->
+      <div v-else class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <template v-if="isLoading">
+            <Skeleton v-for="n in 8" :key="n" />
+          </template>
+          <template v-else>
+            <div v-for="product in sortedProducts" :key="product.id" class="group bg-white rounded-2xl p-5 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.12)] transition-all duration-300 flex flex-col gap-4">
+                <div class="flex items-start gap-4">
+                    <div class="relative">
+                      <img v-if="product.thumbnail" :src="assetUrl(product.thumbnail)" loading="lazy" class="w-20 h-20 object-cover rounded-xl border border-slate-100" />
+                      <div v-else class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300 border border-slate-100">
+                          <Smartphone class="w-8 h-8" />
+                      </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-slate-900 truncate">{{ product.brand }}</p>
+                        <p class="text-sm text-slate-600 truncate">{{ product.model }}</p>
+                        <p class="text-[11px] text-slate-400 font-mono mt-1 bg-slate-50 inline-block px-1.5 py-0.5 rounded">IMEI: {{ product.imei1 }}</p>
+                        <p class="text-[10px] text-slate-400 mt-1.5">เพิ่มเมื่อ: {{ formatDate(product.createdAt) }}</p>
+                    </div>
                 </div>
-              </div>
-          </div>
+                
+                <div class="flex items-center justify-between border-t border-slate-50 pt-4">
+                  <p class="text-xl font-black text-slate-900 tracking-tight">฿{{ Number(product.sellPrice).toLocaleString() }}</p>
+                  <div class="relative flex items-center group">
+                    <select 
+                      :value="product.status" 
+                      @change="e => updateStatus(product.id, e.target.value)"
+                      :class="statusClass(product.status)"
+                      class="appearance-none pl-4 pr-9 py-2 text-[10px] font-black uppercase rounded-2xl border-none cursor-pointer focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm group-hover:shadow-md"
+                    >
+                      <option value="available">พร้อมขาย</option>
+                      <option value="sold">ขายแล้ว</option>
+                      <option value="reserved">จองแล้ว</option>
+                      <option value="repair">ส่งซ่อม</option>
+                      <option value="import">รอนำเข้า</option>
+                    </select>
+                    <ChevronDown class="w-3.5 h-3.5 absolute right-3 pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-end border-t border-slate-50 pt-3 mt-auto">
+                  <div class="flex space-x-1">
+                      <button @click="printWarranty(product)" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="พิมพ์ใบประกัน"><FileText class="w-4 h-4" /></button>
+                      <button @click="editProduct(product.id)" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="แก้ไข"><Edit3 class="w-4 h-4" /></button>
+                      <button @click="deleteProduct(product.id)" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="ลบ"><Trash2 class="w-4 h-4" /></button>
+                  </div>
+                </div>
+            </div>
+          </template>
       </div>
     </div>
   </div>
@@ -141,6 +153,7 @@ import * as XLSX from 'xlsx';
 import { generateWarrantyReceipt } from '../../utils/pdfGenerator';
 import { getApiBasePath, assetUrl } from '../../config/api';
 import { useToast } from 'vue-toastification';
+import Skeleton from '../../components/Skeleton.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -152,6 +165,7 @@ const searchQuery = ref('');
 const viewMode = ref('table');
 const sortKey = ref('');
 const sortOrder = ref(1);
+const isLoading = ref(true);
 
 const columns = [
     { key: 'thumbnail', label: 'รูปปก' },
@@ -247,19 +261,16 @@ const updateStatus = async (id, newStatus) => {
 };
 
 const fetchProducts = async () => {
-  console.log('DEBUG: ProductList fetchProducts called');
-  if (!authStore.token) {
-    console.warn('DEBUG: No token available in authStore');
-    return;
-  }
+  isLoading.value = true;
   try {
     const response = await axios.get(`${getApiBasePath()}/products`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
-    console.log('DEBUG: ProductList API response received', response.data);
     products.value = response.data;
   } catch (error) {
     console.error('DEBUG: Failed to fetch products:', error);
+  } finally {
+    isLoading.value = false;
   }
 };
 

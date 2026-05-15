@@ -58,5 +58,6 @@ router.put('/:id', auth, checkRole('admin'), upload.fields([
 
 router.delete('/:id', auth, checkRole('admin'), productController.deleteProduct);
 router.delete('/images/:imageId', auth, checkRole('admin'), productController.deleteProductImage);
+router.delete('/vdo/:id', auth, checkRole('admin'), productController.deleteProductVdo);
 
 module.exports = router;
