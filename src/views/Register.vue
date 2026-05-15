@@ -73,6 +73,7 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { Smartphone, User, Lock, Mail } from 'lucide-vue-next';
 import { getApiBasePath } from '../config/api';
+import { useToast } from 'vue-toastification';
 
 const name = ref('');
 const email = ref('');
@@ -81,6 +82,7 @@ const phone = ref(''); // เพิ่มตัวแปรเก็บเบอ
 const loading = ref(false);
 const error = ref('');
 const router = useRouter();
+const toast = useToast();
 
 const handleRegister = async () => {
   loading.value = true;
@@ -93,10 +95,11 @@ const handleRegister = async () => {
       phone: phone.value, // ส่งเบอร์โทรไป
       role: 'customer' // เปลี่ยนเป็น customer
     });
-    alert('สมัครสมาชิกสำเร็จ!');
+    toast.success('สมัครสมาชิกสำเร็จ!');
     router.push('/login');
   } catch (err) {
     error.value = err.response?.data?.message || 'เกิดข้อผิดพลาดในการสมัครสมาชิก';
+    toast.error(error.value);
   } finally {
     loading.value = false;
   }

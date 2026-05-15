@@ -140,10 +140,12 @@ import {
 import * as XLSX from 'xlsx';
 import { generateWarrantyReceipt } from '../../utils/pdfGenerator';
 import { getApiBasePath, assetUrl } from '../../config/api';
+import { useToast } from 'vue-toastification';
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+const toast = useToast();
 const products = ref([]);
 const storeSettings = ref({});
 const searchQuery = ref('');
@@ -209,9 +211,10 @@ const deleteProduct = async (id) => {
         headers: { Authorization: `Bearer ${authStore.token}` }
       });
       await fetchProducts();
+      toast.success('ลบสินค้าสำเร็จ');
     } catch (error) {
       console.error('Failed to delete product', error);
-      alert('เกิดข้อผิดพลาดในการลบสินค้า');
+      toast.error('เกิดข้อผิดพลาดในการลบสินค้า');
     }
   }
 };
@@ -232,9 +235,10 @@ const updateStatus = async (id, newStatus) => {
         headers: { Authorization: `Bearer ${authStore.token}` }
       });
       await fetchProducts();
+      toast.success('อัปเดตสถานะสินค้าสำเร็จ');
     } catch (error) {
       console.error('Failed to update product status', error);
-      alert('เกิดข้อผิดพลาดในการอัปเดตสถานะสินค้า');
+      toast.error('เกิดข้อผิดพลาดในการอัปเดตสถานะสินค้า');
     }
   } else {
     // Refresh to reset the dropdown value if cancelled

@@ -106,11 +106,13 @@ import axios from 'axios';
 import { useCartStore } from '../store/cart';
 import { X, Check } from 'lucide-vue-next';
 import { getApiBasePath, assetUrl } from '../config/api';
+import { useToast } from 'vue-toastification';
 
 const props = defineProps({ isOpen: Boolean });
 const emit = defineEmits(['close']);
 
 const cartStore = useCartStore();
+const toast = useToast();
 const loading = ref(false);
 const isSuccess = ref(false);
 const activeTab = ref('cart');
@@ -169,7 +171,7 @@ const handleCheckout = async () => {
     isSuccess.value = true;
     fetchMyReservations(); // Refresh list behind the scenes
   } catch (error) {
-    alert(error.response?.data?.message || 'เกิดข้อผิดพลาดในการจอง');
+    toast.error(error.response?.data?.message || 'เกิดข้อผิดพลาดในการจอง');
   } finally {
     loading.value = false;
   }

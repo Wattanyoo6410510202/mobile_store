@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import axios from 'axios';
 import { useCartStore } from './cart';
 import { getApiBasePath } from '../config/api';
+import router from '../router';
 
 const api = axios.create({
   baseURL: getApiBasePath(),
@@ -49,7 +50,7 @@ export const useAuthStore = defineStore('auth', {
       this.token = null;
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.reload();
+      router.push('/login');
     },
   },
 });

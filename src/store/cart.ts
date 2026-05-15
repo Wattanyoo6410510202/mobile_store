@@ -17,7 +17,7 @@ export const useCartStore = defineStore('cart', () => {
   async function fetchCart() {
     if (!authStore.user) return;
     try {
-      const token = localStorage.getItem('token');
+      const token = authStore.token;
       const response = await axios.get(`${getApiBasePath()}/cart`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -33,7 +33,7 @@ export const useCartStore = defineStore('cart', () => {
     }
     
     try {
-      const token = localStorage.getItem('token');
+      const token = authStore.token;
       const response = await axios.post(`${getApiBasePath()}/cart`, 
         { product_id: product.id },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -46,7 +46,7 @@ export const useCartStore = defineStore('cart', () => {
 
   const removeItem = async (cartItemId: string) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = authStore.token;
       await axios.delete(`${getApiBasePath()}/cart/${cartItemId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });

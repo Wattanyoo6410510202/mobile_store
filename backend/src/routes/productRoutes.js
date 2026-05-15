@@ -6,6 +6,7 @@ const checkRole = require('../middleware/checkRole');
 const upload = require('../middleware/upload');
 
 router.get('/', productController.getProducts);
+router.get('/stats/dashboard', auth, checkRole('admin'), productController.getStats);
 router.get('/:id', productController.getProduct);
 router.post('/', auth, checkRole('admin'), upload.fields([
   { name: 'images', maxCount: 20 },

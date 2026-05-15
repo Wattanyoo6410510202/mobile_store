@@ -549,10 +549,12 @@ import {
   UserCheck, CheckCircle2, AlertTriangle, PenTool, FileText, Check
 } from 'lucide-vue-next';
 import { getApiBasePath, assetUrl } from '../../config/api';
+import { useToast } from 'vue-toastification';
 
 const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
+const toast = useToast();
 const currentStep = ref(1);
 const loading = ref(false);
 const fetching = ref(false);
@@ -701,8 +703,9 @@ const deleteCategoryImage = async (category) => {
         headers: { Authorization: `Bearer ${authStore.token}` }
       });
       existingImages.value = existingImages.value.filter(img => img.id !== existing.id);
+      toast.success('ลบรูปภาพสำเร็จ');
     } catch (error) {
-      alert('ไม่สามารถลบรูปภาพได้');
+      toast.error('ไม่สามารถลบรูปภาพได้');
     }
   } else {
     form[category] = null;
@@ -717,9 +720,10 @@ const deleteVdo360 = async () => {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     form.vdo360 = null;
+    toast.success('ลบวิดีโอสำเร็จ');
   } catch (error) {
     console.error('Delete VDO failed:', error);
-    alert('ไม่สามารถลบวิดีโอได้');
+    toast.error('ไม่สามารถลบวิดีโอได้');
   }
 };
 
@@ -756,7 +760,7 @@ const fetchProduct = async () => {
     }
   } catch (error) {
     console.error('Failed to fetch product', error);
-    alert('ไม่พบข้อมูลสินค้า');
+    toast.error('ไม่พบข้อมูลสินค้า');
     router.push('/admin/products');
   } finally {
     fetching.value = false;
@@ -774,8 +778,9 @@ const deleteImage = async (imageId) => {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     existingImages.value = existingImages.value.filter(img => img.id !== imageId);
+    toast.success('ลบรูปภาพเพิ่มเติมสำเร็จ');
   } catch (error) {
-    alert('ไม่สามารถลบรูปภาพได้');
+    toast.error('ไม่สามารถลบรูปภาพได้');
   }
 };
 
@@ -787,9 +792,10 @@ const deleteImageThumbnail = async () => {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     existingThumbnail.value = null;
+    toast.success('ลบรูปปกสำเร็จ');
   } catch (error) {
     console.error('Delete thumbnail failed:', error);
-    alert('ไม่สามารถลบรูปปกได้');
+    toast.error('ไม่สามารถลบรูปปกได้');
   }
 };
 
@@ -828,10 +834,11 @@ const handleSubmit = async () => {
       }
     });
     
+    toast.success(isEdit.value ? 'อัปเดตข้อมูลสำเร็จ' : 'เพิ่มสินค้าสำเร็จ');
     router.push('/admin/products');
   } catch (error) {
     console.error('Save failed:', error.response?.data || error.message);
-    alert('ผิดพลาด: ' + (error.response?.data?.message || error.message));
+    toast.error('ผิดพลาด: ' + (error.response?.data?.message || error.message));
   } finally {
     loading.value = false;
   }

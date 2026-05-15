@@ -11,37 +11,37 @@
 
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
-      <div class="stat-card">
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md">
         <div class="flex items-center justify-between">
           <div>
             <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">สินค้าทั้งหมด</h3>
             <p class="text-2xl font-bold text-slate-800 mt-1">{{ stats.total }}</p>
           </div>
-          <div class="icon-box bg-blue-50 text-blue-600">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-blue-50 text-blue-600">
             <Package class="w-5 h-5" />
           </div>
         </div>
       </div>
 
-      <div class="stat-card">
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md">
         <div class="flex items-center justify-between">
           <div>
             <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">พร้อมขาย</h3>
             <p class="text-2xl font-bold text-emerald-600 mt-1">{{ stats.available }}</p>
           </div>
-          <div class="icon-box bg-emerald-50 text-emerald-600">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-emerald-50 text-emerald-600">
             <CheckCircle class="w-5 h-5" />
           </div>
         </div>
       </div>
 
-      <div class="stat-card">
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md">
         <div class="flex items-center justify-between">
           <div>
             <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">ขายแล้วเดือนนี้</h3>
             <p class="text-2xl font-bold text-amber-600 mt-1">{{ stats.sold }}</p>
           </div>
-          <div class="icon-box bg-amber-50 text-amber-600">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-amber-50 text-amber-600">
             <ShoppingCart class="w-5 h-5" />
           </div>
         </div>
@@ -50,8 +50,8 @@
 
     <!-- Quick Actions -->
     <div class="grid grid-cols-2 sm:grid-cols-2 gap-4 lg:gap-6">
-      <router-link to="/admin/users" class="action-card group">
-        <div class="icon-box bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+      <router-link to="/admin/users" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md flex items-center gap-4 group">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
           <Users class="w-6 h-6" />
         </div>
         <div class="text-left">
@@ -60,8 +60,8 @@
         </div>
       </router-link>
 
-      <router-link to="/admin/reports" class="action-card group">
-        <div class="icon-box bg-rose-50 text-rose-600 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+      <router-link to="/admin/reports" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md flex items-center gap-4 group">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-rose-50 text-rose-600 group-hover:bg-rose-600 group-hover:text-white transition-colors">
           <FileBarChart class="w-6 h-6" />
         </div>
         <div class="text-left">
@@ -75,11 +75,33 @@
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200">
       <div class="p-5 border-b border-slate-100 flex items-center justify-between">
         <h3 class="text-sm font-bold text-slate-800">อัปเดตสต็อกล่าสุด</h3>
-        <router-link to="/products" class="text-blue-600 text-xs font-bold hover:underline">ดูทั้งหมด</router-link>
+        <router-link to="/admin/products" class="text-blue-600 text-xs font-bold hover:underline">ดูทั้งหมด</router-link>
       </div>
       <div class="p-2">
-        <div class="p-8 text-center text-slate-400 text-xs">
+        <div v-if="stats.recent.length === 0" class="p-8 text-center text-slate-400 text-xs">
           ไม่พบรายการอัปเดตล่าสุด
+        </div>
+        <div v-else class="divide-y divide-slate-50">
+          <div v-for="product in stats.recent" :key="product.id" class="p-3 flex items-center justify-between hover:bg-slate-50 rounded-lg transition-colors">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded bg-slate-100 flex items-center justify-center text-slate-400">
+                <Smartphone class="w-4 h-4" />
+              </div>
+              <div>
+                <p class="text-xs font-bold text-slate-800">{{ product.brand }} {{ product.model }}</p>
+                <p class="text-[10px] text-slate-400">{{ new Date(product.updatedAt).toLocaleDateString('th-TH') }}</p>
+              </div>
+            </div>
+            <span :class="{
+              'bg-emerald-50 text-emerald-600': product.status === 'available',
+              'bg-slate-100 text-slate-500': product.status === 'sold',
+              'bg-amber-50 text-amber-600': product.status === 'reserved',
+              'bg-red-50 text-red-600': product.status === 'repair',
+              'bg-violet-50 text-violet-600': product.status === 'import'
+            }" class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
+              {{ product.status === 'available' ? 'พร้อมขาย' : product.status === 'sold' ? 'ขายแล้ว' : product.status === 'reserved' ? 'จองแล้ว' : product.status === 'repair' ? 'ส่งซ่อม' : 'รอนำเข้า' }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -104,7 +126,8 @@ const authStore = useAuthStore();
 const stats = reactive({
   total: 0,
   available: 0,
-  sold: 0
+  sold: 0,
+  recent: []
 });
 
 const currentDate = computed(() => {
@@ -117,13 +140,13 @@ const currentDate = computed(() => {
 
 const fetchStats = async () => {
   try {
-    const response = await axios.get(`${getApiBasePath()}/products`, {
+    const response = await axios.get(`${getApiBasePath()}/products/stats/dashboard`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
-    const products = response.data;
-    stats.total = products.length;
-    stats.available = products.filter(p => p.status === 'available').length;
-    stats.sold = products.filter(p => p.status === 'sold').length;
+    stats.total = response.data.total;
+    stats.available = response.data.available;
+    stats.sold = response.data.sold;
+    stats.recent = response.data.recent || [];
   } catch (error) {
     console.error('Failed to fetch dashboard stats', error);
   }
@@ -132,16 +155,4 @@ const fetchStats = async () => {
 onMounted(fetchStats);
 </script>
 
-<style scoped>
-@reference "../style.css";
 
-.stat-card {
-  @apply bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md;
-}
-.icon-box {
-  @apply w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0;
-}
-.action-card {
-  @apply bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md flex items-center gap-4;
-}
-</style>

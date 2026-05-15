@@ -316,10 +316,12 @@ import { useAuthStore } from '../store/auth';
 import CartModal from '../components/CartModal.vue';
 import { useRouter } from 'vue-router';
 import { getApiBasePath, assetUrl } from '../config/api';
+import { useToast } from 'vue-toastification';
 
 const isCartOpen = ref(false);
 const cartStore = useCartStore();
 const authStore = useAuthStore();
+const toast = useToast();
 const availableProducts = ref([]);
 const loading = ref(true);
 const selectedBrand = ref(null);
@@ -332,7 +334,7 @@ const addToCart = (product) => {
     cartStore.addItem(product);
     isCartOpen.value = true;
   } catch (error) {
-    alert(error.message);
+    toast.warning(error.message);
     router.push('/login');
   }
 };

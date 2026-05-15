@@ -9,7 +9,7 @@
         </h1>
         <p class="text-sm text-slate-500 font-medium">ดูแลรายชื่อพนักงานและสิทธิ์การเข้าถึงระบบ VIP Phone</p>
       </div>
-      <button @click="isAddModalOpen = true" class="gh-btn gh-btn-primary flex items-center gap-2 px-4 py-2">
+      <button @click="isAddModalOpen = true" class="gh-btn bg-[#2da44e] text-white hover:bg-[#2c974b] border-[#1b1f2326] shadow-sm flex items-center gap-2 px-4 py-2">
         <UserPlus class="w-4 h-4" />
         เพิ่มพนักงานใหม่
       </button>
@@ -112,20 +112,20 @@
 
         <!-- Modal Body -->
         <form @submit.prevent="handleAddUser" class="p-6 space-y-4">
-          <div class="form-group">
-            <label>ชื่อ-นามสกุลจริง</label>
-            <input v-model="newUser.name" type="text" required placeholder="เช่น สมชาย ใจดี">
+          <div class="flex flex-col gap-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">ชื่อ-นามสกุลจริง</label>
+            <input v-model="newUser.name" type="text" required placeholder="เช่น สมชาย ใจดี" class="bg-white border border-slate-300 rounded-lg p-2.5 text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none transition-all">
           </div>
-          <div class="form-group">
-            <label>ชื่อผู้ใช้ (Username)</label>
-            <input v-model="newUser.email" type="text" required placeholder="ใช้สำหรับเข้าสู่ระบบ">
+          <div class="flex flex-col gap-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">ชื่อผู้ใช้ (Username)</label>
+            <input v-model="newUser.email" type="text" required placeholder="ใช้สำหรับเข้าสู่ระบบ" class="bg-white border border-slate-300 rounded-lg p-2.5 text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none transition-all">
           </div>
-          <div class="form-group">
-            <label>รหัสผ่านเริ่มต้น</label>
-            <input v-model="newUser.password" type="password" required placeholder="อย่างน้อย 4 ตัวอักษร">
+          <div class="flex flex-col gap-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">รหัสผ่านเริ่มต้น</label>
+            <input v-model="newUser.password" type="password" required placeholder="อย่างน้อย 4 ตัวอักษร" class="bg-white border border-slate-300 rounded-lg p-2.5 text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none transition-all">
           </div>
-          <div class="form-group">
-            <label>ระดับสิทธิ์การใช้งาน</label>
+          <div class="flex flex-col gap-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">ระดับสิทธิ์การใช้งาน</label>
             <div class="grid grid-cols-2 gap-2 mt-1">
               <label class="relative flex flex-col p-3 rounded-lg border-2 cursor-pointer transition"
                 :class="newUser.role === 'staff' ? 'bg-blue-50/50 border-blue-500 shadow-sm' : 'border-slate-100 hover:bg-slate-50'">
@@ -145,7 +145,7 @@
           <!-- Modal Footer -->
           <div class="flex gap-3 pt-6 mt-4 border-t border-slate-100">
             <button type="button" @click="isAddModalOpen = false" class="gh-btn px-4 py-2 flex-1">ยกเลิก</button>
-            <button type="submit" class="gh-btn gh-btn-primary px-4 py-2 flex-1" :disabled="loading">
+            <button type="submit" class="gh-btn bg-[#2da44e] text-white hover:bg-[#2c974b] border-[#1b1f2326] shadow-sm px-4 py-2 flex-1" :disabled="loading">
               <Loader2 v-if="loading" class="w-4 h-4 animate-spin inline mr-2" />
               {{ loading ? 'กำลังบันทึก...' : 'บันทึกข้อมูล' }}
             </button>
@@ -171,8 +171,10 @@ import {
   ShieldAlert,
   Loader2 
 } from 'lucide-vue-next';
+import { useToast } from 'vue-toastification';
 
 const authStore = useAuthStore();
+const toast = useToast();
 const users = ref([]);
 const isAddModalOpen = ref(false);
 const loading = ref(false);
@@ -202,6 +204,7 @@ const handleAddUser = async () => {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     await fetchUsers();
+    toast.success('เพิ่มพนักงานสำเร็จ');
     isAddModalOpen.value = false;
     // Reset form
     newUser.name = '';
@@ -209,7 +212,7 @@ const handleAddUser = async () => {
     newUser.password = '';
     newUser.role = 'staff';
   } catch (error) {
-    alert('ผิดพลาด: ' + (error.response?.data?.message || error.message));
+    toast.error('ผิดพลาด: ' + (error.response?.data?.message || error.message));
   } finally {
     loading.value = false;
   }
@@ -222,28 +225,13 @@ const deleteUser = async (id) => {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     await fetchUsers();
+    toast.success('ลบพนักงานสำเร็จ');
   } catch (error) {
-    alert('ไม่สามารถลบผู้ใช้ได้');
+    toast.error('ไม่สามารถลบผู้ใช้ได้');
   }
 };
 
 onMounted(fetchUsers);
 </script>
 
-<style scoped>
-@reference "../../style.css";
 
-.form-group {
-  @apply flex flex-col gap-1;
-}
-.form-group label {
-  @apply text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1;
-}
-.form-group input, .form-input {
-  @apply bg-white border border-slate-300 rounded-lg p-2.5 text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none transition-all;
-}
-
-.gh-btn-primary {
-  @apply bg-[#2da44e] text-white hover:bg-[#2c974b] border-[#1b1f2326] shadow-sm;
-}
-</style>

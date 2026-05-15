@@ -15,6 +15,24 @@ exports.getProducts = async (req, res) => {
   }
 };
 
+exports.getStats = async (req, res) => {
+  try {
+    const total = await Product.count();
+    const available = await Product.count({ where: { status: 'available' } });
+    const sold = await Product.count({ where: { status: 'sold' } });
+    
+    const recent = await Product.findAll({
+      limit: 5,
+      order: [['updatedAt', 'DESC']],
+      attributes: ['id', 'brand', 'model', 'status', 'updatedAt']
+    });
+
+    res.json({ total, available, sold, recent });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching stats', error: error.message });
+  }
+};
+
 exports.getProduct = async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id, {
