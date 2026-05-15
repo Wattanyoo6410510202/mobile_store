@@ -67,11 +67,11 @@ exports.updateReservationStatus = async (req, res) => {
       include: [Product, Customer],
     });
 
-    if (status === 'confirmed' && oldStatus !== 'confirmed') {
-      const io = req.app.get('io');
-      io.emit('new_reservation', { message: 'มีการยืนยันการจองใหม่', reservation: fresh });
-    }
-    emitReservationSync(req, fresh ? [fresh] : []);
+    // if (status === 'confirmed' && oldStatus !== 'confirmed') {
+    //   const io = req.app.get('io');
+    //   io.emit('new_reservation', { message: 'มีการยืนยันการจองใหม่', reservation: fresh });
+    // }
+    // emitReservationSync(req, fresh ? [fresh] : []); // นำออก
 
     res.json(fresh);
   } catch (error) {
@@ -116,7 +116,7 @@ exports.updateReservation = async (req, res) => {
     const fresh = await Reservation.findByPk(id, {
       include: [Product, Customer],
     });
-    emitReservationSync(req, fresh ? [fresh] : []);
+    // emitReservationSync(req, fresh ? [fresh] : []); // นำออก
     res.json(fresh);
   } catch (error) {
     res.status(500).json({ message: 'Error updating reservation', error: error.message });

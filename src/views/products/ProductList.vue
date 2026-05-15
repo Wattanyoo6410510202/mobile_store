@@ -248,15 +248,18 @@ const updateStatus = async (id, newStatus) => {
       await axios.put(`${getApiBasePath()}/products/${id}`, updateData, {
         headers: { Authorization: `Bearer ${authStore.token}` }
       });
-      await fetchProducts();
+      
+      // อัปเดตข้อมูลภายใน Array เพื่อให้หน้าจอเปลี่ยนโดยไม่ต้องโหลดใหม่
+      const product = products.value.find(p => p.id === id);
+      if (product) {
+        product.status = newStatus;
+        if (newStatus === 'sold') product.saleDate = updateData.saleDate;
+      }
       toast.success('อัปเดตสถานะสินค้าสำเร็จ');
     } catch (error) {
       console.error('Failed to update product status', error);
       toast.error('เกิดข้อผิดพลาดในการอัปเดตสถานะสินค้า');
     }
-  } else {
-    // Refresh to reset the dropdown value if cancelled
-    await fetchProducts();
   }
 };
 
