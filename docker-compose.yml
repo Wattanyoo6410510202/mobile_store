@@ -35,7 +35,7 @@ services:
     environment:
       - DB_HOST=db
       - DB_USER=root
-      - DB_PASS=rootpassword
+      - DB_PASSWORD=rootpassword
       - DB_NAME=phone_store
       - JWT_SECRET=your_super_secret_jwt_key
       - PORT=5000
