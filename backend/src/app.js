@@ -46,13 +46,13 @@ app.use('/api/checkout', require('./routes/checkoutRoutes'));
 app.use('/api/reservations', require('./routes/reservationRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
 app.get('/api/settings', async (req, res) => {
-    const settings = await Settings.findByPk(1) || await Settings.create({});
-    res.json(settings);
+  const settings = await Settings.findByPk(1) || await Settings.create({});
+  res.json(settings);
 });
 app.put('/api/settings', async (req, res) => {
-    let settings = await Settings.findByPk(1);
-    settings = await settings.update(req.body);
-    res.json(settings);
+  let settings = await Settings.findByPk(1);
+  settings = await settings.update(req.body);
+  res.json(settings);
 });
 
 // Routes placeholder
@@ -65,33 +65,13 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => console.log('User disconnected'));
 });
 
-// sequelize.sync()
-//   .then(() => {
-//     console.log('Database synced');
-    
-//     // Seed admin if not exists
-//     const User = require('./models/User');
-//     const bcrypt = require('bcryptjs');
-//     bcrypt.hash('1234', 10).then(hash => {
-//         User.findOrCreate({
-//             where: { email: 'admin' },
-//             defaults: {
-//                 name: 'Administrator',
-//                 password: hash,
-//                 role: 'admin'
-//             }
-//         });
-//     });
-    
-//     http.listen(PORT, () => {
-//       console.log(`Server is running on port ${PORT}`);
-//     });
-//   })
-//   .catch(err => {
-//     console.error('Failed to sync database:', err);
-//   });
-
-// Start Server without auto-sync
-http.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+sequelize.authenticate()
+  .then(() => {
+    console.log('Database connected successfully (No sync)');
+    http.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
