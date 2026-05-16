@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 16, 2026 at 05:30 AM
+-- Generation Time: May 16, 2026 at 06:52 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -140,6 +140,25 @@ INSERT INTO `products` (`id`, `barcode`, `imei1`, `imei2`, `serialNumber`, `bran
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `purchasequotations`
+--
+
+CREATE TABLE `purchasequotations` (
+  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `requester_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `items` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`items`)),
+  `total_amount` decimal(12,2) DEFAULT 0.00,
+  `status` enum('pending','approved','rejected','paid','completed') DEFAULT 'pending',
+  `notes` text DEFAULT NULL,
+  `payment_slip` varchar(255) DEFAULT NULL,
+  `receipt_file` varchar(255) DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `reservations`
 --
 
@@ -165,6 +184,7 @@ CREATE TABLE `reservations` (
 
 INSERT INTO `reservations` (`id`, `product_id`, `customer_id`, `user_id`, `status`, `deposit_amount`, `reservation_date`, `reservation_expires_at`, `notes`, `attachment_file`, `createdAt`, `updatedAt`, `slip_image`) VALUES
 ('0bea93f6-4c98-4703-a95e-a02dfa88be19', 'f22b97e6-93d1-4fed-8790-66b1fa4f57fb', 'f5d9b8a5-7e96-4474-b6aa-f403b0032a03', '21080a7f-52bf-4ca6-80ef-c842d55ba42a', 'confirmed', 0.00, '2026-05-15 22:01:33', NULL, NULL, NULL, '2026-05-15 22:01:33', '2026-05-15 22:01:37', NULL),
+('bbca2a97-47c3-421e-9b28-6467e71efb90', '1af6640e-4e36-441b-95dc-31a972c915eb', 'f5d9b8a5-7e96-4474-b6aa-f403b0032a03', '21080a7f-52bf-4ca6-80ef-c842d55ba42a', 'pending', 0.00, '2026-05-16 11:23:18', NULL, NULL, NULL, '2026-05-16 11:23:18', '2026-05-16 11:23:18', NULL),
 ('bef1cc92-abee-400d-8e8d-48c671325077', 'f22b97e6-93d1-4fed-8790-66b1fa4f57fb', 'f5d9b8a5-7e96-4474-b6aa-f403b0032a03', '21080a7f-52bf-4ca6-80ef-c842d55ba42a', 'confirmed', 0.00, '2026-05-15 20:09:29', NULL, NULL, NULL, '2026-05-15 20:09:29', '2026-05-15 22:01:21', NULL),
 ('d95d5f8d-be1b-49e1-ab7c-82758b0382c1', 'e7672733-39a2-4d13-96cd-ec9734ee4d80', 'f5d9b8a5-7e96-4474-b6aa-f403b0032a03', '21080a7f-52bf-4ca6-80ef-c842d55ba42a', 'confirmed', 0.00, '2026-05-15 20:08:45', NULL, NULL, NULL, '2026-05-15 20:08:45', '2026-05-15 22:01:23', NULL);
 
@@ -420,6 +440,13 @@ ALTER TABLE `products`
   ADD UNIQUE KEY `barcode_63` (`barcode`);
 
 --
+-- Indexes for table `purchasequotations`
+--
+ALTER TABLE `purchasequotations`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `requester_id` (`requester_id`);
+
+--
 -- Indexes for table `reservations`
 --
 ALTER TABLE `reservations`
@@ -571,6 +598,12 @@ ALTER TABLE `productimages`
   ADD CONSTRAINT `productimages_ibfk_7` FOREIGN KEY (`productId`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `productimages_ibfk_8` FOREIGN KEY (`productId`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `productimages_ibfk_9` FOREIGN KEY (`productId`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `purchasequotations`
+--
+ALTER TABLE `purchasequotations`
+  ADD CONSTRAINT `purchasequotations_ibfk_1` FOREIGN KEY (`requester_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `reservations`

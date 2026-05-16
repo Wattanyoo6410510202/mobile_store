@@ -63,6 +63,10 @@ exports.updateReservationStatus = async (req, res) => {
       attachment_file,
     });
 
+    if (status === 'sold') {
+      await Product.update({ status: 'sold', saleDate: new Date() }, { where: { id: reservation.product_id } });
+    }
+
     const fresh = await Reservation.findByPk(id, {
       include: [Product, Customer],
     });
@@ -113,12 +117,35 @@ exports.updateReservation = async (req, res) => {
     }
 
     await reservation.update(updates);
+
+    if (updates.status === 'sold') {
+      await Product.update({ status: 'sold', saleDate: new Date() }, { where: { id: reservation.product_id } });
+    }
+
     const fresh = await Reservation.findByPk(id, {
       include: [Product, Customer],
     });
-    // emitReservationSync(req, fresh ? [fresh] : []); // นำออก
     res.json(fresh);
   } catch (error) {
     res.status(500).json({ message: 'Error updating reservation', error: error.message });
   }
 };
+
+    exports.updateReservationSlip = async (req, res) => {
+    try {
+    const { id } = req.params;
+    const reservation = await Reservation.findByPk(id);
+    if (!reservation) return res.status(404).json({ message: 'Reservation not found' });
+
+    if (req.files?.slip_image?.[0]) {
+      const slip_image = `/uploads/reservations/${req.files.slip_image[0].filename}`;
+      await reservation.update({ slip_image });
+      const fresh = await Reservation.findByPk(id, { include: [Product, Customer] });
+      res.json(fresh);
+    } else {
+      res.status(400).json({ message: 'No slip image uploaded' });
+    }
+    } catch (error) {
+    res.status(500).json({ message: 'Error uploading slip', error: error.message });
+    }
+    };

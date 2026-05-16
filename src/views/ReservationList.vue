@@ -79,6 +79,7 @@
                   <option value="confirmed">ยืนยันแล้ว</option>
                   <option value="cancelled">ยกเลิก</option>
                   <option value="completed">เสร็จสิ้น</option>
+                  <option value="sold">ขายแล้ว</option>
                 </select>
               </td>
               <td class="px-4 py-3 text-xs">
@@ -104,14 +105,34 @@
                 <span class="line-clamp-2">{{ row.notes || '—' }}</span>
               </td>
               <td class="px-4 py-3">
-                <button
-                  type="button"
-                  class="gh-btn !p-2"
-                  title="แก้ไข"
-                  @click="openEditModal(row)"
-                >
-                  <Pencil class="w-4 h-4" />
-                </button>
+                <div class="flex items-center gap-1">
+                  <button
+                    type="button"
+                    class="gh-btn !p-2"
+                    title="แก้ไข"
+                    @click="openEditModal(row)"
+                  >
+                    <Pencil class="w-4 h-4" />
+                  </button>
+                  <button
+                    v-if="row.status === 'sold'"
+                    type="button"
+                    class="gh-btn !p-2 text-emerald-600"
+                    title="พิมพ์ใบเสร็จ"
+                    @click="printReceipt(row)"
+                  >
+                    <FileText class="w-4 h-4" />
+                  </button>
+                  <button
+                    v-if="row.status === 'sold'"
+                    type="button"
+                    class="gh-btn !p-2 text-blue-600"
+                    title="พิมพ์ใบกำกับ"
+                    @click="printInvoice(row)"
+                  >
+                    <Printer class="w-4 h-4" />
+                  </button>
+                </div>
               </td>
             </tr>
             <tr v-if="!loading && reservations.length === 0">
@@ -209,13 +230,35 @@ import { useRoute } from 'vue-router';
 import { useAuthStore } from '../store/auth';
 import { useReservationStore } from '../store/reservation';
 import { getApiBasePath, assetUrl } from '../config/api';
-import { Loader2, Search, Download, Pencil, X } from 'lucide-vue-next';
+import { Loader2, Search, Download, Pencil, X, FileText, Printer } from 'lucide-vue-next';
 import * as XLSX from 'xlsx';
+import { generateSalesReceipt, generateTaxInvoice } from '../utils/pdfGenerator';
 
 const authStore = useAuthStore();
 const route = useRoute();
 const reservationStore = useReservationStore();
 const { reservationSyncNonce } = storeToRefs(reservationStore);
+
+const storeSettings = ref<any>({});
+
+async function fetchSettings() {
+  try {
+    const { data } = await axios.get(`${getApiBasePath()}/settings`, {
+      headers: { Authorization: `Bearer ${authStore.token}` }
+    });
+    storeSettings.value = data;
+  } catch (error) {
+    console.error('Failed to fetch settings', error);
+  }
+}
+
+function printReceipt(row: ReservationRow) {
+  generateSalesReceipt(row.Product as any, row.Customer as any, storeSettings.value, row as any);
+}
+
+function printInvoice(row: ReservationRow) {
+  generateTaxInvoice(row.Product as any, row.Customer as any, storeSettings.value, row as any);
+}
 
 type ProductRow = { brand?: string; model?: string };
 type CustomerRow = { name?: string; phone?: string };
@@ -263,6 +306,7 @@ function translateReservationStatus(status: string) {
     confirmed: 'ยืนยันแล้ว',
     cancelled: 'ยกเลิก',
     completed: 'เสร็จสิ้น',
+    sold: 'ขายแล้ว',
   };
   return map[status] || status;
 }
@@ -517,7 +561,10 @@ async function submitEdit() {
   }
 }
 
-onMounted(fetchReservations);
+onMounted(() => {
+  fetchReservations();
+  fetchSettings();
+});
 
 watch(reservationSyncNonce, () => {
   if (route.name !== 'ReservationList') return;

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white font-sans selection:bg-blue-100 selection:text-blue-600 overflow-x-hidden">
+  <div class="min-h-screen bg-white font-sans selection:bg-red-100 selection:text-red-600 overflow-x-hidden">
     <!-- Navbar (Premium Redesign) -->
     <nav
       class="fixed top-0 left-0 w-full z-50 transition-all duration-500"
@@ -11,8 +11,8 @@
         <!-- Logo -->
         <div class="flex items-center space-x-2.5 group cursor-pointer" @click="selectedBrand = null">
           <div
-            class="relative w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center font-[1000] text-white italic text-sm shadow-lg transition-all duration-500 group-hover:shadow-blue-500/40 group-hover:scale-110 group-hover:rotate-12"
-            :class="isScrolled ? 'shadow-blue-500/25' : 'shadow-blue-500/40'">
+            class="relative w-9 h-9 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center font-[1000] text-white italic text-sm shadow-lg transition-all duration-500 group-hover:shadow-red-500/40 group-hover:scale-110 group-hover:rotate-12"
+            :class="isScrolled ? 'shadow-red-500/25' : 'shadow-red-500/40'">
             <span class="relative z-10">V</span>
             <div class="absolute inset-0 rounded-xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </div>
@@ -20,7 +20,7 @@
             <h1
               class="text-xl font-[1000] tracking-tighter uppercase transition-colors duration-500"
               :class="isScrolled ? 'text-slate-900' : 'text-white'">
-              VIP<span class="text-blue-400">PHONE</span>
+              VIP<span class="text-red-400">PHONE</span>
             </h1>
           </div>
         </div>
@@ -34,14 +34,14 @@
             <a v-for="link in navLinks" :key="link.id" :href="link.href"
               class="relative px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300 group"
               :class="activeSection === link.id
-                ? 'text-blue-500'
+                ? 'text-red-500'
                 : isScrolled ? 'text-slate-400 hover:text-slate-900' : 'text-white/70 hover:text-white'">
               {{ link.label }}
               <span
                 class="absolute bottom-1 left-3 right-3 h-0.5 rounded-full transition-transform duration-300 origin-left"
                 :class="activeSection === link.id
-                  ? 'bg-blue-500 scale-x-100'
-                  : 'bg-blue-400 scale-x-0 group-hover:scale-x-100'">
+                  ? 'bg-red-500 scale-x-100'
+                  : 'bg-red-400 scale-x-0 group-hover:scale-x-100'">
               </span>
             </a>
           </div>
@@ -50,11 +50,11 @@
           <button @click="isCartOpen = true"
             class="relative p-2 rounded-xl transition-all duration-300"
             :class="isScrolled
-              ? 'text-slate-500 hover:text-blue-600 hover:bg-blue-50'
+              ? 'text-slate-500 hover:text-red-600 hover:bg-red-50'
               : 'text-white/80 hover:text-white hover:bg-white/10'">
             <ShoppingBag class="w-4 h-4 sm:w-5 sm:h-5" />
             <span v-if="cartStore.cartCount > 0"
-              class="absolute -top-0.5 -right-0.5 bg-gradient-to-br from-blue-500 to-blue-600 text-white text-[8px] font-black min-w-[16px] h-4 px-1 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/30 animate-cart-badge">
+              class="absolute -top-0.5 -right-0.5 bg-gradient-to-br from-red-500 to-red-600 text-white text-[8px] font-black min-w-[16px] h-4 px-1 rounded-full flex items-center justify-center shadow-lg shadow-red-500/30 animate-cart-badge">
               {{ cartStore.cartCount }}
             </span>
           </button>
@@ -62,7 +62,7 @@
           <!-- User / Login -->
           <div v-if="authStore.user" class="flex items-center space-x-2">
             <div
-              class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-[10px] font-black shadow-lg shadow-blue-500/20">
+              class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white text-[10px] font-black shadow-lg shadow-red-500/20">
               {{ authStore.user.email?.charAt(0).toUpperCase() || 'U' }}
             </div>
             <button @click="authStore.logout()"
@@ -76,7 +76,7 @@
           <router-link v-else to="/login"
             class="relative px-4 py-2 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300 overflow-hidden group active:scale-95"
             :class="isScrolled
-              ? 'bg-slate-900 text-white hover:bg-blue-600 shadow-lg shadow-slate-200'
+              ? 'bg-slate-900 text-white hover:bg-red-600 shadow-lg shadow-slate-200'
               : 'bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm border border-white/20'">
             <span class="relative z-10">เข้าสู่ระบบ</span>
           </router-link>
@@ -130,8 +130,8 @@
           <div class="px-6 py-6 space-y-1">
             <a v-for="link in navLinks" :key="link.id" :href="link.href"
               @click="isMobileMenuOpen = false"
-              class="block px-4 py-3.5 rounded-xl text-sm font-bold text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
-              :class="activeSection === link.id ? 'text-blue-600 bg-blue-50' : ''">
+              class="block px-4 py-3.5 rounded-xl text-sm font-bold text-slate-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
+              :class="activeSection === link.id ? 'text-red-600 bg-red-50' : ''">
               {{ link.label }}
             </a>
           </div>
@@ -156,20 +156,20 @@
       <div class="absolute inset-0 overflow-hidden pointer-events-none" style="z-index: 5;">
         <!-- Large glow orb top-right -->
         <div class="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full opacity-20 animate-pulse-slow"
-          style="background: radial-gradient(circle, #3B82F6 0%, transparent 70%);"></div>
+          style="background: radial-gradient(circle, #EF4444 0%, transparent 70%);"></div>
         <!-- Small glow orb bottom-left -->
         <div class="absolute -bottom-20 -left-20 w-[300px] h-[300px] rounded-full opacity-15 animate-pulse-slow-delayed"
-          style="background: radial-gradient(circle, #8B5CF6 0%, transparent 70%);"></div>
+          style="background: radial-gradient(circle, #DC2626 0%, transparent 70%);"></div>
         <!-- Mid glow orb center -->
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-10 animate-pulse-very-slow"
-          style="background: radial-gradient(circle, #60A5FA 0%, transparent 70%);"></div>
+          style="background: radial-gradient(circle, #F87171 0%, transparent 70%);"></div>
       </div>
 
       <!-- Floating Glass Elements -->
       <div class="absolute inset-0 overflow-hidden pointer-events-none" style="z-index: 6;">
         <div class="floating-element absolute top-[20%] right-[10%] w-20 h-20 rounded-2xl border border-white/10 backdrop-blur-xl bg-white/5"></div>
         <div class="floating-element-delayed absolute bottom-[25%] left-[8%] w-14 h-14 rounded-full border border-white/10 backdrop-blur-xl bg-white/5"></div>
-        <div class="floating-element-slow absolute top-[60%] right-[15%] w-10 h-10 rounded-full bg-blue-500/10 backdrop-blur-sm border border-blue-400/20"></div>
+        <div class="floating-element-slow absolute top-[60%] right-[15%] w-10 h-10 rounded-full bg-red-500/10 backdrop-blur-sm border border-red-400/20"></div>
         <div class="floating-element-delayed absolute top-[15%] left-[12%] w-16 h-16 rounded-2xl border border-white/10 backdrop-blur-xl bg-white/5"></div>
       </div>
 
@@ -178,10 +178,10 @@
         <!-- Premium Badge -->
         <div class="mb-5 animate-fade-in-up">
           <span
-            class="relative inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 backdrop-blur-2xl border border-white/10 text-blue-300 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.35em] rounded-full shadow-2xl">
+            class="relative inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 backdrop-blur-2xl border border-white/10 text-red-300 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.35em] rounded-full shadow-2xl">
             <span class="relative flex w-1.5 h-1.5">
-              <span class="animate-ping absolute inline-flex w-full h-full rounded-full bg-blue-400 opacity-75"></span>
-              <span class="relative inline-flex w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+              <span class="animate-ping absolute inline-flex w-full h-full rounded-full bg-red-400 opacity-75"></span>
+              <span class="relative inline-flex w-1.5 h-1.5 rounded-full bg-red-500"></span>
             </span>
             PREMIUM CERTIFIED DEALER
             <span class="w-px h-3 bg-white/20"></span>
@@ -194,22 +194,22 @@
           class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-[1000] text-white leading-none tracking-[-0.06em] mb-3 animate-fade-in-up relative">
           <span class="block">VIP</span>
           <span
-            class="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 drop-shadow-[0_0_25px_rgba(59,130,246,0.3)]">
+            class="block text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-red-500 to-red-600 drop-shadow-[0_0_25px_rgba(239,68,68,0.3)]">
             PHONE
           </span>
         </h2>
 
         <!-- Animated divider line -->
         <div class="flex items-center justify-center gap-2 mb-5 animate-fade-in-up delay-200">
-          <div class="h-px w-10 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
-          <div class="w-1 h-1 rounded-full bg-blue-500 shadow-lg shadow-blue-500/50"></div>
-          <div class="h-px w-10 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+          <div class="h-px w-10 bg-gradient-to-r from-transparent via-red-400 to-transparent"></div>
+          <div class="w-1 h-1 rounded-full bg-red-500 shadow-lg shadow-red-500/50"></div>
+          <div class="h-px w-10 bg-gradient-to-r from-transparent via-red-400 to-transparent"></div>
         </div>
 
         <!-- Subtitle -->
         <p
           class="text-sm sm:text-base md:text-lg text-white/80 font-bold max-w-3xl mx-auto mb-6 leading-relaxed animate-fade-in-up delay-300">
-          <span class="inline-block bg-gradient-to-r from-white/90 via-blue-200 to-white/90 bg-clip-text text-transparent">
+          <span class="inline-block bg-gradient-to-r from-white/90 via-red-200 to-white/90 bg-clip-text text-transparent">
             ยกระดับสมาร์ทโฟนมือสองสู่มาตรฐานใหม่
           </span>
           <br />
@@ -221,9 +221,9 @@
         <!-- CTA Buttons -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-in-up delay-500">
           <a href="#deals"
-            class="group relative px-8 py-3 bg-white text-black rounded-full text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300 overflow-hidden shadow-2xl shadow-blue-500/20">
+            class="group relative px-8 py-3 bg-white text-black rounded-full text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300 overflow-hidden shadow-2xl shadow-red-500/20">
             <span class="relative z-10 group-hover:text-white transition-colors duration-300">เลือกซื้อสินค้า</span>
-            <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300 rounded-full"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300 rounded-full"></div>
           </a>
           <a href="#quality"
             class="group px-8 py-3 border border-white/20 text-white/80 hover:text-white rounded-full text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300 hover:border-white/40 hover:bg-white/5 backdrop-blur-sm">
@@ -252,7 +252,7 @@
         <!-- Animated Scroll Indicator -->
         <div class="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce-slow">
           <div class="w-5 h-8 rounded-full border-2 border-white/15 flex items-start justify-center pt-1.5">
-            <div class="w-0.5 h-2.5 bg-blue-400/70 rounded-full animate-scroll-dot"></div>
+            <div class="w-0.5 h-2.5 bg-red-400/70 rounded-full animate-scroll-dot"></div>
           </div>
         </div>
       </div>
@@ -268,8 +268,8 @@
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <div v-for="brand in brandOptions" :key="brand.name"
             @click="selectedBrand = (brand.name === 'ทั้งหมด' ? null : brand.name)"
-            class="group bg-white border border-slate-100 rounded-2xl p-6 flex flex-col items-center justify-center hover:border-blue-400 hover:shadow-lg transition-all duration-500 cursor-pointer h-36 hover-reveal"
-            :class="(selectedBrand === brand.name || (selectedBrand === null && brand.name === 'ทั้งหมด')) ? 'border-blue-600 shadow-lg shadow-blue-100/50' : ''">
+            class="group bg-white border border-slate-100 rounded-2xl p-6 flex flex-col items-center justify-center hover:border-red-400 hover:shadow-lg transition-all duration-500 cursor-pointer h-36 hover-reveal"
+            :class="(selectedBrand === brand.name || (selectedBrand === null && brand.name === 'ทั้งหมด')) ? 'border-red-600 shadow-lg shadow-red-100/50' : ''">
             <div class="h-12 flex items-center justify-center mb-5">
               <img v-if="brand.imageUrl" :src="brand.imageUrl" :alt="brand.name" loading="lazy"
                 class="w-10 h-10 object-contain scale-110 group-hover:scale-125 transition-transform duration-500 opacity-90 group-hover:opacity-100" />
@@ -277,8 +277,8 @@
                 class="text-slate-900 scale-110 group-hover:scale-125 transition-transform duration-500 w-10 h-10" />
             </div>
             <span
-              class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] group-hover:text-blue-600 transition-colors"
-              :class="(selectedBrand === brand.name || (selectedBrand === null && brand.name === 'ทั้งหมด')) ? 'text-blue-600' : ''">{{
+              class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] group-hover:text-red-600 transition-colors"
+              :class="(selectedBrand === brand.name || (selectedBrand === null && brand.name === 'ทั้งหมด')) ? 'text-red-600' : ''">{{
                 brand.name }}</span>
           </div>
         </div>
@@ -289,17 +289,17 @@
         <div class="relative z-10 p-8 lg:p-10 bg-white/10 backdrop-blur-[1px]">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
-              <p class="text-[10px] font-[1000] text-blue-700 uppercase tracking-[0.3em] mb-1.5">MARKET WATCH</p>
+              <p class="text-[10px] font-[1000] text-red-700 uppercase tracking-[0.3em] mb-1.5">MARKET WATCH</p>
               <h2 class="text-3xl font-bold text-slate-900 tracking-tight leading-none">Featured Deals</h2>
             </div>
             <div class="flex items-center gap-3">
               <div class="relative group">
-                <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-blue-600 transition-colors pointer-events-none" />
+                <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-red-600 transition-colors pointer-events-none" />
                 <input
                   v-model="searchQuery"
                   type="text"
                   placeholder="ค้นหาสินค้า..."
-                  class="pl-9 pr-4 py-2.5 text-[11px] font-semibold bg-slate-50 border border-slate-200 rounded-xl w-52 focus:outline-none focus:border-blue-400 focus:bg-white focus:shadow-md focus:shadow-blue-100/50 transition-all placeholder:text-slate-300"
+                  class="pl-9 pr-4 py-2.5 text-[11px] font-semibold bg-slate-50 border border-slate-200 rounded-xl w-52 focus:outline-none focus:border-red-400 focus:bg-white focus:shadow-md focus:shadow-red-100/50 transition-all placeholder:text-slate-300"
                 />
                 <button
                   v-if="searchQuery"
@@ -310,7 +310,7 @@
                 </button>
               </div>
               <button v-if="selectedBrand" @click="selectedBrand = null"
-                class="text-[10px] font-black text-slate-300 hover:text-blue-600 transition-colors uppercase tracking-widest whitespace-nowrap">
+                class="text-[10px] font-black text-slate-300 hover:text-red-600 transition-colors uppercase tracking-widest whitespace-nowrap">
                 ล้างการเลือก
               </button>
             </div>
@@ -337,7 +337,7 @@
                 </div>
                 <div class="absolute top-2 left-2">
                   <span v-if="product.condition === 'new'"
-                    class="bg-[#2563EB] text-white text-[8px] font-black px-2 py-0.5 rounded-sm uppercase tracking-wider shadow-sm">HOT</span>
+                    class="bg-[#EF4444] text-white text-[8px] font-black px-2 py-0.5 rounded-sm uppercase tracking-wider shadow-sm">HOT</span>
                   <span v-else
                     class="bg-[#DC2626] text-white text-[8px] font-black px-2 py-0.5 rounded-sm uppercase tracking-wider shadow-sm">SALE
                     -15%</span>
@@ -365,7 +365,7 @@
                 </div>
 
                 <button @click="addToCart(product)"
-                  class="w-full bg-black text-white py-3 rounded-md text-[10px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 transition-all active:scale-[0.98]">
+                  class="w-full bg-black text-white py-3 rounded-md text-[10px] font-black uppercase tracking-[0.2em] hover:bg-red-600 transition-all active:scale-[0.98]">
                   เพิ่มลงตะกร้า
                 </button>
               </div>
@@ -387,8 +387,8 @@
       <section id="quality" class="section-animate" v-intersection>
         <div class="grid lg:grid-cols-2 gap-12 items-center border-t border-slate-100 pt-20">
           <div class="bg-black text-white p-10 lg:p-16 rounded-[3rem] relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full blur-[80px]"></div>
-            <span class="text-[9px] font-black text-blue-400 uppercase tracking-[0.5em] mb-8 block">DIAGNOSTIC
+            <div class="absolute top-0 right-0 w-64 h-64 bg-red-600/20 rounded-full blur-[80px]"></div>
+            <span class="text-[9px] font-black text-red-400 uppercase tracking-[0.5em] mb-8 block">DIAGNOSTIC
               EXCELLENCE</span>
             <h2 class="text-4xl lg:text-5xl font-[1000] mb-10 leading-none tracking-tighter">
               BEYOND <br />
@@ -400,7 +400,7 @@
                 { title: 'สุขภาพแบตเตอรี่', desc: 'ยืนยันความจุจริงและรอบการชาร์จ' },
                 { title: 'เครือข่ายและการเชื่อมต่อ', desc: 'ทดสอบ 5G, WiFi และ Bluetooth เต็มรูปแบบ' }
               ]" :key="item.title" class="flex items-start space-x-4">
-                <div class="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center mt-1 shrink-0">
+                <div class="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center mt-1 shrink-0">
                   <Check class="w-3 h-3 text-white" />
                 </div>
                 <div>
@@ -421,11 +421,11 @@
             </p>
             <div class="grid grid-cols-2 gap-6">
               <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                <p class="text-4xl font-black text-slate-900 mb-1 leading-none tracking-tighter text-blue-600">100%</p>
+                <p class="text-4xl font-black text-slate-900 mb-1 leading-none tracking-tighter text-red-600">100%</p>
                 <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">อะไหล่แท้แน่นอน</p>
               </div>
               <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                <p class="text-4xl font-black text-slate-900 mb-1 leading-none tracking-tighter text-blue-600">30</p>
+                <p class="text-4xl font-black text-slate-900 mb-1 leading-none tracking-tighter text-red-600">30</p>
                 <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">วัน การรับประกัน</p>
               </div>
             </div>
@@ -436,9 +436,9 @@
       <!-- FAQ Section (Accordion) -->
       <section id="faq" class="section-animate py-16 md:py-20" v-intersection>
         <div class="text-center mb-10 md:mb-14 faq-header">
-          <span class="inline-block text-[9px] font-black text-blue-600 uppercase tracking-[0.4em] mb-3">FAQ</span>
+          <span class="inline-block text-[9px] font-black text-red-600 uppercase tracking-[0.4em] mb-3">FAQ</span>
           <h2 class="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
-            คำถาม<span class="text-blue-600">ที่พบบ่อย</span>
+            คำถาม<span class="text-red-600">ที่พบบ่อย</span>
           </h2>
           <p class="text-sm text-slate-400 mt-3 max-w-xl mx-auto">
             รวมคำถามที่ลูกค้ามักสอบถาม เราพร้อมให้ข้อมูลอย่างชัดเจน
@@ -448,7 +448,7 @@
           <div v-for="(item, i) in faqItems" :key="i"
             class="faq-item group rounded-2xl border transition-all duration-300 cursor-pointer overflow-hidden"
             :class="activeFaq === i
-              ? 'border-blue-200 bg-white shadow-lg shadow-blue-100/30'
+              ? 'border-red-200 bg-white shadow-lg shadow-red-100/30'
               : 'border-slate-100 bg-[#F8FAFC] hover:border-slate-200 hover:bg-white hover:shadow-sm'">
             
             <!-- Question Header -->
@@ -458,8 +458,8 @@
                 <div
                   class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300"
                   :class="activeFaq === i
-                    ? 'bg-blue-600 text-white shadow-sm shadow-blue-200'
-                    : 'bg-blue-50 text-blue-500 group-hover:bg-blue-100'">
+                    ? 'bg-red-600 text-white shadow-sm shadow-red-200'
+                    : 'bg-red-50 text-red-500 group-hover:bg-red-100'">
                   <span class="text-[11px] font-black">{{ i + 1 }}</span>
                 </div>
                 <h4
@@ -471,7 +471,7 @@
               <ChevronDown
                 class="w-4 h-4 shrink-0 transition-all duration-300"
                 :class="activeFaq === i
-                  ? 'rotate-180 text-blue-600'
+                  ? 'rotate-180 text-red-600'
                   : 'text-slate-300 group-hover:text-slate-500'" />
             </button>
 
@@ -480,7 +480,7 @@
               class="accordion-collapse"
               :class="activeFaq === i ? 'accordion-open' : ''">
               <div class="px-5 pb-4 md:px-6 md:pb-5">
-                <div class="pl-10 border-l-2 border-blue-100">
+                <div class="pl-10 border-l-2 border-red-100">
                   <p class="text-sm text-slate-500 leading-relaxed">
                     {{ item.a }}
                   </p>
@@ -494,7 +494,7 @@
         <div class="text-center mt-10 faq-cta">
           <p class="text-xs text-slate-400 mb-4">ยังมีข้อสงสัย? ทีมของเราพร้อมช่วยเหลือคุณ</p>
           <a href="#"
-            class="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 transition-all duration-300 active:scale-95 shadow-lg shadow-slate-200">
+            class="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:bg-red-600 transition-all duration-300 active:scale-95 shadow-lg shadow-slate-200">
             ติดต่อเรา
             <ArrowRight class="w-3.5 h-3.5" />
           </a>
@@ -528,9 +528,9 @@
           <div class="lg:col-span-1">
             <div class="flex items-center space-x-2.5 mb-5">
               <div
-                class="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center font-[1000] text-white italic text-sm shadow-lg shadow-blue-500/20">
+                class="w-9 h-9 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center font-[1000] text-white italic text-sm shadow-lg shadow-red-500/20">
                 V</div>
-              <h3 class="text-xl font-[1000] tracking-tighter uppercase">VIP<span class="text-blue-400">PHONE</span></h3>
+              <h3 class="text-xl font-[1000] tracking-tighter uppercase">VIP<span class="text-red-400">PHONE</span></h3>
             </div>
             <p class="text-sm text-slate-400 leading-relaxed mb-6">
               ผู้เชี่ยวชาญด้านสมาร์ทโฟนมือสองคุณภาพสูง ทุกเครื่องผ่านการตรวจสอบโดยผู้ชำนาญการ ก่อนถึงมือคุณ
@@ -538,19 +538,19 @@
             <!-- Social Links -->
             <div class="flex items-center space-x-3">
               <a href="#"
-                class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all duration-300 group">
+                class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-300 group">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
               </a>
               <a href="#"
-                class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all duration-300">
+                class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-300">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/></svg>
               </a>
               <a href="#"
-                class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all duration-300">
+                class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-300">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
               </a>
               <a href="#"
-                class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all duration-300">
+                class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-300">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.35 3.24 9.35 5.47v1.99H6.73v3.91h2.62V23.5h4.15V11.38h2.98l.29-3.92z"/></svg>
               </a>
             </div>
@@ -558,12 +558,12 @@
 
           <!-- Quick Links -->
           <div>
-            <h4 class="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em] mb-5">ลิงก์</h4>
+            <h4 class="text-[10px] font-black text-red-400 uppercase tracking-[0.3em] mb-5">ลิงก์</h4>
             <ul class="space-y-3.5">
               <li v-for="link in footerQuickLinks" :key="link.label">
                 <a :href="link.href"
                   class="text-sm text-slate-400 hover:text-white transition-all duration-300 flex items-center group">
-                  <span class="w-1 h-1 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 mr-2.5 transition-opacity"></span>
+                  <span class="w-1 h-1 rounded-full bg-red-500 opacity-0 group-hover:opacity-100 mr-2.5 transition-opacity"></span>
                   {{ link.label }}
                 </a>
               </li>
@@ -572,12 +572,12 @@
 
           <!-- Support -->
           <div>
-            <h4 class="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em] mb-5">ช่วยเหลือ</h4>
+            <h4 class="text-[10px] font-black text-red-400 uppercase tracking-[0.3em] mb-5">ช่วยเหลือ</h4>
             <ul class="space-y-3.5">
               <li v-for="link in footerSupportLinks" :key="link.label">
                 <a :href="link.href"
                   class="text-sm text-slate-400 hover:text-white transition-all duration-300 flex items-center group">
-                  <span class="w-1 h-1 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 mr-2.5 transition-opacity"></span>
+                  <span class="w-1 h-1 rounded-full bg-red-500 opacity-0 group-hover:opacity-100 mr-2.5 transition-opacity"></span>
                   {{ link.label }}
                 </a>
               </li>
@@ -586,22 +586,22 @@
 
           <!-- Contact -->
           <div>
-            <h4 class="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em] mb-5">ติดต่อ</h4>
+            <h4 class="text-[10px] font-black text-red-400 uppercase tracking-[0.3em] mb-5">ติดต่อ</h4>
             <ul class="space-y-4">
               <li class="flex items-start space-x-3">
-                <MapPin class="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
+                <MapPin class="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
                 <span class="text-sm text-slate-400">88/1 ถนนสุขุมวิท แขวงคลองเตย<br/>เขตคลองเตย กรุงเทพฯ 10110</span>
               </li>
               <li class="flex items-center space-x-3">
-                <Phone class="w-4 h-4 text-blue-400 shrink-0" />
+                <Phone class="w-4 h-4 text-red-400 shrink-0" />
                 <a href="tel:+6621234567" class="text-sm text-slate-400 hover:text-white transition-colors">02-123-4567</a>
               </li>
               <li class="flex items-center space-x-3">
-                <Mail class="w-4 h-4 text-blue-400 shrink-0" />
+                <Mail class="w-4 h-4 text-red-400 shrink-0" />
                 <a href="mailto:contact@vipphone.com" class="text-sm text-slate-400 hover:text-white transition-colors">contact@vipphone.com</a>
               </li>
               <li class="flex items-center space-x-3">
-                <Clock class="w-4 h-4 text-blue-400 shrink-0" />
+                <Clock class="w-4 h-4 text-red-400 shrink-0" />
                 <span class="text-sm text-slate-400">จ.-ส. 09:00 - 18:00 น.</span>
               </li>
             </ul>
@@ -627,7 +627,7 @@
     <div class="fixed bottom-0 sm:bottom-6 left-0 sm:left-auto right-0 sm:right-6 z-50 sm:flex sm:items-end sm:justify-end">
       <!-- Chat Bubble Button (Desktop only when chat closed) -->
       <button v-if="!isChatOpen" @click="openChat"
-        class="hidden sm:flex w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105 transition-all duration-300 items-center justify-center group relative">
+        class="hidden sm:flex w-14 h-14 rounded-full bg-gradient-to-br from-red-500 to-red-700 text-white shadow-xl shadow-red-500/30 hover:shadow-red-500/50 hover:scale-105 transition-all duration-300 items-center justify-center group relative">
         <MessageCircle class="w-6 h-6 group-hover:scale-110 transition-transform" />
         <!-- Notification dot -->
         <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
@@ -637,7 +637,7 @@
 
       <!-- Mobile Quick Button (shown on mobile only) -->
       <button v-if="!isChatOpen" @click="openChat"
-        class="flex sm:hidden fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-xl shadow-blue-500/30 hover:scale-105 active:scale-95 transition-all duration-300 items-center justify-center group">
+        class="flex sm:hidden fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-br from-red-500 to-red-700 text-white shadow-xl shadow-red-500/30 hover:scale-105 active:scale-95 transition-all duration-300 items-center justify-center group">
         <MessageCircle class="w-6 h-6" />
         <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
           <span class="text-[7px] font-black">1</span>
@@ -653,14 +653,14 @@
           border-b-0 sm:border-b">
         
         <!-- Header -->
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3.5 flex items-center justify-between shrink-0">
+        <div class="bg-gradient-to-r from-red-600 to-red-700 px-4 py-3.5 flex items-center justify-between shrink-0">
           <div class="flex items-center space-x-3">
             <div class="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
               <Bot class="w-4 h-4 text-white" />
             </div>
             <div>
               <h4 class="text-sm font-bold text-white">VIP Phone</h4>
-              <p class="text-[10px] text-blue-200">ออนไลน์</p>
+              <p class="text-[10px] text-red-200">ออนไลน์</p>
             </div>
           </div>
           <button @click="closeChat"
@@ -675,27 +675,27 @@
             class="flex"
             :class="msg.isUser ? 'justify-end' : 'justify-start'">
             <!-- Bot avatar -->
-            <div v-if="!msg.isUser" class="w-7 h-7 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mr-2.5 mt-0.5 shrink-0">
+            <div v-if="!msg.isUser" class="w-7 h-7 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center mr-2.5 mt-0.5 shrink-0">
               <Bot class="w-3.5 h-3.5 text-white" />
             </div>
             <div
               class="max-w-[85%] px-3.5 py-2.5 text-sm leading-relaxed shadow-sm"
               :class="msg.isUser
-                ? 'bg-blue-600 text-white rounded-2xl rounded-br-md'
+                ? 'bg-red-600 text-white rounded-2xl rounded-br-md'
                 : 'bg-white text-slate-700 rounded-2xl rounded-bl-md border border-slate-100'">
               {{ msg.text }}
             </div>
           </div>
           <!-- Typing indicator -->
           <div v-if="isTyping" class="flex justify-start">
-            <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mr-2.5 mt-0.5 shrink-0">
+            <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center mr-2.5 mt-0.5 shrink-0">
               <Bot class="w-3.5 h-3.5 text-white" />
             </div>
             <div class="bg-white border border-slate-100 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
               <div class="typing-dots flex items-center space-x-1">
-                <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
-                <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
-                <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-red-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-red-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-red-400 rounded-full"></span>
               </div>
             </div>
           </div>
@@ -705,7 +705,7 @@
         <div v-if="showQuickReplies" class="px-4 py-2.5 border-t border-slate-100 bg-white shrink-0">
           <div class="flex flex-wrap gap-1.5">
             <button v-for="(reply, i) in quickReplies" :key="i" @click="sendQuickReply(reply)"
-              class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:text-blue-600 hover:shadow-sm active:scale-95 transition-all duration-200">
+              class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:border-red-300 hover:text-red-600 hover:shadow-sm active:scale-95 transition-all duration-200">
               {{ reply.text }}
             </button>
           </div>
@@ -715,9 +715,9 @@
         <div class="px-4 py-3 border-t border-slate-100 bg-white shrink-0">
           <form @submit.prevent="sendMessage" class="flex items-center space-x-2">
             <input ref="chatInputRef" v-model="chatInput" type="text" placeholder="พิมพ์ข้อความ..."
-              class="flex-1 text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all placeholder:text-slate-400" />
+              class="flex-1 text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-red-400 focus:bg-white focus:ring-2 focus:ring-red-100 transition-all placeholder:text-slate-400" />
             <button type="submit" :disabled="!chatInput.trim()"
-              class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0">
+              class="w-9 h-9 rounded-xl bg-red-600 text-white flex items-center justify-center hover:bg-red-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0">
               <Send class="w-4 h-4" />
             </button>
           </form>
@@ -1005,7 +1005,7 @@ const getConditionLabel = (health) => {
 };
 
 const getConditionClass = (health) => {
-  if (health >= 95) return 'border-blue-400 text-blue-600';
+  if (health >= 95) return 'border-red-400 text-red-600';
   if (health >= 85) return 'border-slate-300 text-slate-500';
   return 'border-orange-200 text-orange-600';
 };

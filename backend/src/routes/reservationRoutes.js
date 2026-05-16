@@ -14,6 +14,7 @@ router.get('/', auth, checkRole('admin'), reservationController.getAllReservatio
 router.get('/me', auth, reservationController.getMyReservations);
 router.post('/', reservationController.createReservation);
 router.put('/:id/status', auth, checkRole('admin'), reservationController.updateReservationStatus);
+router.put('/:id/slip', auth, reservationUploadFields, reservationController.updateReservationSlip);
 router.put('/:id', auth, checkRole('admin'), reservationUploadFields, reservationController.updateReservation);
 
 module.exports = router;

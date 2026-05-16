@@ -84,13 +84,32 @@
                   {{ getStatusText(res.status) }}
                 </span>
               </div>
-              <div class="flex items-center space-x-4">
+              <div class="flex items-center space-x-4 mb-3">
                 <img :src="assetUrl(res.Product?.thumbnail)" class="w-16 h-16 object-cover rounded-lg shadow-sm bg-white" />
                 <div class="flex-1">
                   <h3 class="font-bold text-sm text-slate-900 leading-tight">{{ res.Product?.model || 'Unknown Product' }}</h3>
                   <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">{{ res.Product?.brand || '' }}</p>
                   <p class="text-sm font-black mt-1 text-slate-900">฿{{ Number(res.Product?.sellPrice || 0).toLocaleString() }}</p>
                 </div>
+              </div>
+              
+              <!-- Buttons -->
+              <div class="flex gap-2 mt-3 pt-3 border-t border-slate-200">
+                <button @click="printQuotation(res)" class="flex-1 flex items-center justify-center gap-1 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-[10px] font-bold uppercase hover:bg-indigo-100 transition-colors">
+                  <FileText class="w-3 h-3" /> Print Quotation (ใบเสนอราคา)
+                </button>
+              </div>
+
+              <!-- Payment Form -->
+              <div v-if="res.status === 'confirmed' && !res.slip_image" class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                <p class="text-[10px] font-bold text-blue-800 uppercase mb-2">แจ้งชำระเงิน / แนบสลิป</p>
+                <div class="flex flex-col gap-2">
+                  <input type="file" @change="(e) => handleSlipUpload(res.id, e)" accept="image/*" class="text-[10px] file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all cursor-pointer" />
+                  <p class="text-[9px] text-blue-600 font-medium">*กรุณาแนบหลักฐานการโอนเงินเพื่อยืนยันการสั่งซื้อ</p>
+                </div>
+              </div>
+              <div v-else-if="res.slip_image" class="mt-3 text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                <Check class="w-3 h-3" /> แนบหลักฐานแล้ว
               </div>
             </div>
           </div>
@@ -101,12 +120,13 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import axios from 'axios';
 import { useCartStore } from '../store/cart';
-import { X, Check } from 'lucide-vue-next';
+import { X, Check, FileText } from 'lucide-vue-next';
 import { getApiBasePath, assetUrl } from '../config/api';
 import { useToast } from 'vue-toastification';
+import { generateReservationReceipt, generateQuotation } from '../utils/pdfGenerator';
 
 const props = defineProps({ isOpen: Boolean });
 const emit = defineEmits(['close']);
@@ -118,8 +138,18 @@ const isSuccess = ref(false);
 const activeTab = ref('cart');
 const myReservations = ref([]);
 const resLoading = ref(false);
+const storeSettings = ref({});
 
 const total = computed(() => cartStore.items.reduce((sum, item) => sum + Number(item.Product.sellPrice), 0));
+
+const fetchSettings = async () => {
+  try {
+    const res = await axios.get(`${getApiBasePath()}/settings`);
+    storeSettings.value = res.data;
+  } catch (error) {
+    console.error('Failed to fetch settings', error);
+  }
+};
 
 const fetchMyReservations = async () => {
   resLoading.value = true;
@@ -137,6 +167,10 @@ const fetchMyReservations = async () => {
   }
 };
 
+onMounted(() => {
+  fetchSettings();
+});
+
 watch(() => props.isOpen, (newVal) => {
   if (newVal) {
     fetchMyReservations();
@@ -146,7 +180,7 @@ watch(() => props.isOpen, (newVal) => {
 });
 
 const getStatusText = (status) => {
-  const map = { pending: 'รอดำเนินการ', confirmed: 'ยืนยันแล้ว', cancelled: 'ยกเลิก', completed: 'เสร็จสิ้น' };
+  const map = { pending: 'รอดำเนินการ', confirmed: 'ยืนยันแล้ว', cancelled: 'ยกเลิก', completed: 'เสร็จสิ้น', sold: 'ขายแล้ว' };
   return map[status] || status;
 };
 
@@ -155,7 +189,8 @@ const getStatusClass = (status) => {
     pending: 'text-orange-600 bg-orange-50 border-orange-200',
     confirmed: 'text-blue-600 bg-blue-50 border-blue-200',
     cancelled: 'text-red-600 bg-red-50 border-red-200',
-    completed: 'text-green-600 bg-green-50 border-green-200'
+    completed: 'text-green-600 bg-green-50 border-green-200',
+    sold: 'text-slate-600 bg-slate-100 border-slate-300'
   };
   return map[status] || 'text-slate-600 bg-slate-50 border-slate-200';
 };
@@ -180,5 +215,44 @@ const handleCheckout = async () => {
 const closeSuccess = () => {
   isSuccess.value = false;
   activeTab.value = 'reservations'; // Switch to reservations tab to show what they just booked
+};
+
+const printReservation = (res) => {
+  const customer = { name: res.Customer?.name, phone: res.Customer?.phone };
+  generateReservationReceipt(res.Product, customer, storeSettings.value, res);
+};
+
+const printQuotation = (res) => {
+  const customer = { name: res.Customer?.name };
+  generateQuotation(res.Product, customer, storeSettings.value);
+};
+
+const handleSlipUpload = async (resId, event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('slip_image', file);
+
+  try {
+    const token = localStorage.getItem('token');
+    // We'll use the customer's own update route if exists, or a dedicated slip upload route.
+    // Looking at reservationRoutes, we only have admin update.
+    // I might need to add a customer update route.
+    // For now, I'll try to use the general update if allowed, or I should add a route.
+    // Wait, customer update is not in routes.
+    
+    // Let's check if I can add a route for customers to upload slip.
+    await axios.put(`${getApiBasePath()}/reservations/${resId}/slip`, formData, {
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    toast.success('แนบหลักฐานการโอนเงินสำเร็จ');
+    fetchMyReservations();
+  } catch (error) {
+    toast.error(error.response?.data?.message || 'เกิดข้อผิดพลาดในการแนบสลิป');
+  }
 };
 </script>

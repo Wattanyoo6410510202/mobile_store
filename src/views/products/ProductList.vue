@@ -55,7 +55,7 @@
                 </td>
                 <td class="px-6 py-4 font-medium text-slate-800">{{ product.brand }}</td>
                 <td class="px-6 py-4">{{ product.model }}</td>
-                <td class="px-6 py-4">{{ product.imei1 }}</td>
+                <td class="px-6 py-4 font-mono">{{ product.imei1 }}</td>
                 <td class="px-6 py-4 text-xs">{{ formatDate(product.createdAt) }}</td>
                 <td class="px-6 py-4 text-xs">{{ formatDate(product.warrantyEndDate) }}</td>
                 <td class="px-6 py-4 font-bold text-slate-800">฿{{ Number(product.sellPrice).toLocaleString() }}</td>
@@ -74,10 +74,12 @@
                   </select>
                 </td>
                 <td class="px-6 py-4">
-                  <div class="flex space-x-2">
-                      <button @click="printWarranty(product)" class="p-2 text-slate-400 hover:text-emerald-600 transition" title="พิมพ์ใบประกัน"><FileText class="w-4 h-4" /></button>
-                      <button @click="editProduct(product.id)" class="p-2 text-slate-400 hover:text-blue-600 transition" title="แก้ไข"><Edit3 class="w-4 h-4" /></button>
-                      <button @click="deleteProduct(product.id)" class="p-2 text-slate-400 hover:text-red-600 transition" title="ลบ"><Trash2 class="w-4 h-4" /></button>
+                  <div class="flex space-x-1">
+                      <button @click="showCode('qr', product.imei1)" class="p-1.5 text-slate-400 hover:text-indigo-600 transition" title="QR Code"><QrCode class="w-4 h-4" /></button>
+                      <button @click="showCode('barcode', product.imei1)" class="p-1.5 text-slate-400 hover:text-indigo-600 transition" title="Barcode"><Barcode class="w-4 h-4" /></button>
+                      <button @click="printWarranty(product)" class="p-1.5 text-slate-400 hover:text-emerald-600 transition" title="พิมพ์ใบประกัน"><FileText class="w-4 h-4" /></button>
+                      <button @click="editProduct(product.id)" class="p-1.5 text-slate-400 hover:text-blue-600 transition" title="แก้ไข"><Edit3 class="w-4 h-4" /></button>
+                      <button @click="deleteProduct(product.id)" class="p-1.5 text-slate-400 hover:text-red-600 transition" title="ลบ"><Trash2 class="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>
@@ -129,6 +131,8 @@
 
                 <div class="flex items-center justify-end border-t border-slate-50 pt-3 mt-auto">
                   <div class="flex space-x-1">
+                      <button @click="showCode('qr', product.imei1)" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="QR Code"><QrCode class="w-4 h-4" /></button>
+                      <button @click="showCode('barcode', product.imei1)" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Barcode"><Barcode class="w-4 h-4" /></button>
                       <button @click="printWarranty(product)" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="พิมพ์ใบประกัน"><FileText class="w-4 h-4" /></button>
                       <button @click="editProduct(product.id)" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="แก้ไข"><Edit3 class="w-4 h-4" /></button>
                       <button @click="deleteProduct(product.id)" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="ลบ"><Trash2 class="w-4 h-4" /></button>
@@ -136,6 +140,27 @@
                 </div>
             </div>
           </template>
+      </div>
+    </div>
+
+    <!-- Code Modal -->
+    <div v-if="showCodeModal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" @click.self="showCodeModal = false">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-in zoom-in duration-300">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="font-black text-slate-900 uppercase tracking-tight">{{ codeModalTitle }}</h3>
+          <button @click="showCodeModal = false" class="text-slate-400 hover:text-black transition-colors p-1"><X class="w-5 h-5" /></button>
+        </div>
+        <div class="flex flex-col items-center gap-6">
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 shadow-inner">
+            <img :src="codeUrl" class="max-w-full h-auto rounded-lg mix-blend-multiply" />
+          </div>
+          <div class="flex gap-2 w-full">
+            <button @click="downloadCode" class="flex-1 py-3 bg-indigo-600 text-white font-black text-xs uppercase tracking-widest rounded-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
+              <Download class="w-4 h-4" /> ดาวน์โหลด
+            </button>
+            <button @click="showCodeModal = false" class="flex-1 py-3 bg-black text-white font-black text-xs uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all">ปิด</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -147,7 +172,7 @@ import axios from 'axios';
 import { useAuthStore } from '../../store/auth';
 import { useRouter, useRoute } from 'vue-router';
 import { 
-  Search, Plus, QrCode, Smartphone, Edit3, FileText, Trash2, Download, Table, LayoutGrid, ChevronDown
+  Search, Plus, QrCode, Smartphone, Edit3, FileText, Trash2, Download, Table, LayoutGrid, ChevronDown, Barcode, X
 } from 'lucide-vue-next';
 import * as XLSX from 'xlsx';
 import { generateWarrantyReceipt } from '../../utils/pdfGenerator';
@@ -166,6 +191,41 @@ const viewMode = ref('table');
 const sortKey = ref('');
 const sortOrder = ref(1);
 const isLoading = ref(true);
+const showCodeModal = ref(false);
+const codeModalTitle = ref('');
+const codeUrl = ref('');
+
+const showCode = (type, imei) => {
+  if (!imei) {
+    toast.error('ไม่มีเลข IMEI สำหรับสินค้านี้');
+    return;
+  }
+  if (type === 'qr') {
+    codeModalTitle.value = 'QR Code - ' + imei;
+    codeUrl.value = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${imei}`;
+  } else {
+    codeModalTitle.value = 'Barcode - ' + imei;
+    codeUrl.value = `https://bwipjs-api.metafloor.com/?bcid=code128&text=${imei}&scale=3&rotate=N&includetext`;
+  }
+  showCodeModal.value = true;
+};
+
+const downloadCode = async () => {
+  try {
+    const response = await fetch(codeUrl.value);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${codeModalTitle.value.replace(/\s+/g, '_')}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    toast.error('ดาวน์โหลดรูปภาพไม่สำเร็จ');
+  }
+};
 
 const columns = [
     { key: 'thumbnail', label: 'รูปปก' },

@@ -1,10 +1,10 @@
 <template>
   <div class="space-y-6">
     <!-- Welcome Section -->
-    <div class="bg-blue-600 rounded-2xl p-6 lg:p-8 text-white shadow-md relative overflow-hidden">
+    <div class="bg-red-600 rounded-2xl p-6 lg:p-8 text-white shadow-md relative overflow-hidden">
       <div class="relative z-10">
         <h1 class="text-xl lg:text-2xl font-bold mb-1">สวัสดี, {{ authStore.user?.name }}!</h1>
-        <p class="text-blue-100 text-sm opacity-90">ข้อมูลสรุปประจำวันที่ {{ currentDate }}</p>
+        <p class="text-red-100 text-sm opacity-90">ข้อมูลสรุปประจำวันที่ {{ currentDate }}</p>
       </div>
       <Smartphone class="absolute right-[-20px] bottom-[-20px] w-32 h-32 opacity-10 rotate-12" />
     </div>
@@ -13,7 +13,7 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6">
       <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md">
         <div class="flex flex-col items-center justify-center text-center">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-50 text-blue-600 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-red-50 text-red-600 mb-3">
             <Package class="w-5 h-5" />
           </div>
           <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">ทั้งหมด</h3>
@@ -99,7 +99,7 @@
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200">
       <div class="p-5 border-b border-slate-100 flex items-center justify-between">
         <h3 class="text-sm font-bold text-slate-800">อัปเดตสต็อกล่าสุด</h3>
-        <router-link to="/admin/products" class="text-blue-600 text-xs font-bold hover:underline">ดูทั้งหมด</router-link>
+        <router-link to="/admin/products" class="text-red-600 text-xs font-bold hover:underline">ดูทั้งหมด</router-link>
       </div>
       <div class="p-2">
         <div v-if="stats.recent.length === 0" class="p-8 text-center text-slate-400 text-xs">
